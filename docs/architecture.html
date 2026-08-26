@@ -3,52 +3,56 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MCPOp System Architecture</title>
+<title>MCPOp System Architecture — Animated</title>
 <style>
   /*
-   * Design:OS Diagram Architecture Contract
-   * Fully self-contained, project token inheritance, zero script, accessible inline SVG.
+   * Design:OS Diagram Architecture Motion Contract
+   * Progressive enhancement, accessible inline SVG, token inheritance,
+   * full reduced-motion and print fallbacks.
    */
   :root {
-    --diagram-paper:       #fafafa;
-    --diagram-surface:     #ffffff;
-    --diagram-ink:         #18181b;
-    --diagram-muted:       #71717a;
-    --diagram-soft:        #a1a1aa;
-    --diagram-rule:        #e4e4e7;
-    --diagram-rule-solid:  #d4d4d8;
-    --diagram-accent:      #18181b;
-    --diagram-accent-tint: #f4f4f5;
-    --diagram-link:        #09090b;
-    --diagram-success:     #15803d;
-    --diagram-success-tint:#f0fdf4;
-    --diagram-danger:      #be123c;
-    --diagram-danger-tint: #fff1f2;
-    --diagram-warning:     #b45309;
-    --diagram-warning-tint:#fffbeb;
+    --diagram-paper:        #fafafa;
+    --diagram-surface:      #ffffff;
+    --diagram-ink:          #18181b;
+    --diagram-muted:        #71717a;
+    --diagram-soft:         #a1a1aa;
+    --diagram-rule:         #e4e4e7;
+    --diagram-rule-solid:   #d4d4d8;
+    --diagram-accent:       #18181b;
+    --diagram-accent-tint:  #f4f4f5;
+    --diagram-link:         #09090b;
+    --diagram-success:      #15803d;
+    --diagram-success-tint: #f0fdf4;
+    --diagram-danger:       #be123c;
+    --diagram-danger-tint:  #fff1f2;
+    --diagram-warning:      #b45309;
+    --diagram-warning-tint: #fffbeb;
 
     --diagram-hairline: 1px;
-    --diagram-gap: 24px;
+    --diagram-gap: 20px;
+
+    --reveal-duration: 380ms;
+    --reveal-stagger: 140ms;
   }
 
   @media (prefers-color-scheme: dark) {
     :root {
-      --diagram-paper:       #09090b;
-      --diagram-surface:     #18181b;
-      --diagram-ink:         #f4f4f5;
-      --diagram-muted:       #a1a1aa;
-      --diagram-soft:        #71717a;
-      --diagram-rule:        #27272a;
-      --diagram-rule-solid:  #3f3f46;
-      --diagram-accent:      #ffffff;
-      --diagram-accent-tint: #27272a;
-      --diagram-link:        #fafafa;
-      --diagram-success:     #4ade80;
-      --diagram-success-tint:#052e16;
-      --diagram-danger:      #fb7185;
-      --diagram-danger-tint: #4c0519;
-      --diagram-warning:     #fbbf24;
-      --diagram-warning-tint:#451a03;
+      --diagram-paper:        #09090b;
+      --diagram-surface:      #18181b;
+      --diagram-ink:          #f4f4f5;
+      --diagram-muted:        #a1a1aa;
+      --diagram-soft:         #71717a;
+      --diagram-rule:         #27272a;
+      --diagram-rule-solid:   #3f3f46;
+      --diagram-accent:       #ffffff;
+      --diagram-accent-tint:  #27272a;
+      --diagram-link:         #fafafa;
+      --diagram-success:      #4ade80;
+      --diagram-success-tint: #052e16;
+      --diagram-danger:       #fb7185;
+      --diagram-danger-tint:  #4c0519;
+      --diagram-warning:      #fbbf24;
+      --diagram-warning-tint: #451a03;
     }
   }
 
@@ -58,12 +62,19 @@
     background: var(--diagram-paper);
     color: var(--diagram-ink);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    padding: 48px 32px;
+    padding: 40px 24px;
     display: flex;
     justify-content: center;
   }
 
   .frame { max-width: 1140px; width: 100%; }
+
+  .header-bar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: var(--diagram-gap);
+  }
 
   .eyebrow {
     font-size: 11px;
@@ -71,21 +82,62 @@
     text-transform: uppercase;
     color: var(--diagram-muted);
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
 
   h1 {
-    font-size: 26px;
+    font-size: 24px;
     font-weight: 700;
     letter-spacing: -0.02em;
     line-height: 1.2;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
   }
 
   .subtitle {
     font-size: 13px;
     color: var(--diagram-muted);
-    margin-bottom: var(--diagram-gap);
+  }
+
+  /* Interactive Motion Controls */
+  .controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    background: var(--diagram-surface);
+    border: var(--diagram-hairline) solid var(--diagram-rule);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-family: ui-monospace, monospace;
+    font-size: 12px;
+  }
+
+  .controls button {
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 10px;
+    cursor: pointer;
+    color: var(--diagram-ink);
+    background: var(--diagram-paper);
+    border: var(--diagram-hairline) solid var(--diagram-rule-solid);
+    border-radius: 6px;
+    transition: background 150ms ease, border-color 150ms ease;
+  }
+
+  .controls button:hover {
+    background: var(--diagram-accent-tint);
+    border-color: var(--diagram-accent);
+  }
+
+  .controls button:focus-visible {
+    outline: 2px solid var(--diagram-accent);
+    outline-offset: 1px;
+  }
+
+  .status {
+    font-size: 11px;
+    color: var(--diagram-muted);
+    margin-left: 4px;
   }
 
   .canvas {
@@ -94,6 +146,7 @@
     border-radius: 12px;
     padding: 24px;
     overflow-x: auto;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
   }
 
   svg { width: 100%; min-width: 980px; height: auto; display: block; }
@@ -122,13 +175,86 @@
 
   .edge-label { fill: var(--diagram-muted); font-size: 11px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
   .edge-label--fast { fill: var(--diagram-success); font-weight: 600; }
+
+  /*
+   * Motion Choreography (T1 CSS keyframes with progressive enhancement)
+   * Elements default to visible. Motion triggers only when [data-motion="on"].
+   */
+  [data-motion="on"] .step {
+    opacity: 0;
+    transform: translateY(6px);
+    will-change: opacity, transform;
+  }
+
+  [data-motion="on"][data-playing="true"] .step {
+    animation: reveal var(--reveal-duration) cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  [data-motion="on"][data-playing="true"] .step-1 { animation-delay: calc(var(--reveal-stagger) * 0); }
+  [data-motion="on"][data-playing="true"] .step-2 { animation-delay: calc(var(--reveal-stagger) * 1); }
+  [data-motion="on"][data-playing="true"] .step-3 { animation-delay: calc(var(--reveal-stagger) * 2); }
+  [data-motion="on"][data-playing="true"] .step-4 { animation-delay: calc(var(--reveal-stagger) * 3); }
+  [data-motion="on"][data-playing="true"] .step-5 { animation-delay: calc(var(--reveal-stagger) * 4); }
+  [data-motion="on"][data-playing="true"] .step-6 { animation-delay: calc(var(--reveal-stagger) * 5); }
+  [data-motion="on"][data-playing="true"] .step-7 { animation-delay: calc(var(--reveal-stagger) * 6); }
+  [data-motion="on"][data-playing="true"] .step-8 { animation-delay: calc(var(--reveal-stagger) * 7); }
+
+  @keyframes reveal {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Active Packet Pulse Animation */
+  [data-motion="on"][data-playing="true"] .flow-pulse {
+    stroke-dasharray: 6 6;
+    animation: pulse-stream 1.2s linear infinite;
+  }
+
+  @keyframes pulse-stream {
+    0% { stroke-dashoffset: 24; }
+    100% { stroke-dashoffset: 0; }
+  }
+
+  /* Reduced Motion Floor */
+  @media (prefers-reduced-motion: reduce) {
+    [data-motion="on"] .step,
+    [data-motion="on"][data-playing="true"] .step {
+      opacity: 1;
+      transform: none;
+      animation: none;
+    }
+    .flow-pulse { animation: none; }
+    .controls { display: none; }
+  }
+
+  @media print {
+    .step { opacity: 1 !important; transform: none !important; animation: none !important; }
+    .controls { display: none; }
+  }
 </style>
 </head>
 <body>
   <div class="frame">
-    <p class="eyebrow">Design:OS Architecture Spec</p>
-    <h1>MCPOp Transparent Proxy &amp; Failure Engine</h1>
-    <p class="subtitle">Zero-overhead stdio interceptor, heuristic failure detector, and local observability dashboard.</p>
+    <div class="header-bar">
+      <div>
+        <p class="eyebrow">Design:OS Architecture · Animated</p>
+        <h1>MCPOp Transparent Proxy &amp; Failure Engine</h1>
+        <p class="subtitle">Real-time signal flow, heuristic failure interception, and telemetry lifecycle.</p>
+      </div>
+
+      <!-- Controls -->
+      <div class="controls" data-diagram-controls>
+        <button type="button" data-action="replay">Replay Flow</button>
+        <button type="button" data-action="toggle">Pause</button>
+        <p class="status" role="status" aria-live="polite">Streaming animation...</p>
+      </div>
+    </div>
 
     <div class="canvas">
       <svg viewBox="0 0 1040 490" xmlns="http://www.w3.org/2000/svg"
@@ -149,146 +275,190 @@
         </defs>
 
         <!-- ZONE 1: AI Client -->
-        <g data-diagram-element="zone" id="zone-client">
+        <g class="step step-1" data-diagram-element="zone" id="zone-client">
           <rect class="zone" x="30" y="40" width="220" height="410"/>
           <text class="zone-label" x="46" y="66">AI Client Layer</text>
         </g>
 
         <!-- ZONE 2: MCPOp Single Binary Core -->
-        <g data-diagram-element="zone" id="zone-mcpop">
+        <g class="step step-2" data-diagram-element="zone" id="zone-mcpop">
           <rect class="zone" x="270" y="40" width="480" height="410"/>
           <text class="zone-label" x="286" y="66">MCPOp Core (Go Binary)</text>
         </g>
 
         <!-- ZONE 3: Target Server -->
-        <g data-diagram-element="zone" id="zone-target">
+        <g class="step step-3" data-diagram-element="zone" id="zone-target">
           <rect class="zone" x="770" y="40" width="230" height="410"/>
           <text class="zone-label" x="786" y="66">MCP Server Process</text>
         </g>
 
-        <!-- NODE: AI Client -->
-        <g data-diagram-element="node" id="node-ai-client">
+        <!-- STEP 1: AI Client Node -->
+        <g class="step step-1" data-diagram-element="node" id="node-ai-client">
           <rect class="node-shape" x="50" y="200" width="180" height="84"/>
           <text class="node-tag" x="66" y="222">Caller</text>
           <text class="node-label" x="66" y="244">Claude / Cursor</text>
           <text class="node-sublabel" x="66" y="264">Agent Runtime (stdio)</text>
         </g>
 
-        <!-- NODE: Transparent Stdio Interceptor (Center Fast Path) -->
-        <g data-diagram-element="node" id="node-proxy-interceptor">
+        <!-- STEP 2: Fast-Path Stdio Interceptor -->
+        <g class="step step-2" data-diagram-element="node" id="node-proxy-interceptor">
           <rect class="node-shape" x="400" y="200" width="220" height="84"/>
           <text class="node-tag" x="416" y="222">Fast Path &lt;0.5ms</text>
           <text class="node-label" x="416" y="244">Stdio Interceptor</text>
           <text class="node-sublabel" x="416" y="264">Non-blocking I/O Pump</text>
         </g>
 
-        <!-- NODE: Focal Core Heuristic Engine (Upper Tier) -->
-        <g data-diagram-element="node" id="node-mcpop-core">
-          <rect class="node-shape node-shape--focal" x="400" y="80" width="220" height="74"/>
-          <text class="node-tag" x="416" y="102">Focal Component</text>
-          <text class="node-label" x="416" y="122">Heuristics Engine</text>
-          <text class="node-sublabel" x="416" y="140">Async Worker Goroutine</text>
-        </g>
+        <!-- STEP 2: Client -> Proxy Request Line -->
+        <line class="step step-2 edge edge--fast flow-pulse" data-diagram-element="edge" id="edge-client-proxy"
+              x1="230" y1="230" x2="400" y2="230" marker-end="url(#arrow)"/>
+        <text class="step step-2 edge-label edge-label--fast" x="315" y="222" text-anchor="middle">stdin</text>
 
-        <!-- NODE: Schema & Lag Validator (Upper Left) -->
-        <g data-diagram-element="node" id="node-schema-validator">
-          <rect class="node-shape node-shape--warning" x="290" y="80" width="94" height="74"/>
-          <text class="node-label" x="302" y="104">Schema</text>
-          <text class="node-label" x="302" y="120">&amp; Lag</text>
-          <text class="node-tag" x="302" y="140">Audit</text>
-        </g>
+        <!-- STEP 3: Proxy -> Target Server Request Line -->
+        <line class="step step-3 edge edge--fast flow-pulse" data-diagram-element="edge" id="edge-proxy-target"
+              x1="620" y1="230" x2="790" y2="230" marker-end="url(#arrow)"/>
+        <text class="step step-3 edge-label edge-label--fast" x="705" y="222" text-anchor="middle">pass-through</text>
 
-        <!-- NODE: Loop Detector (Upper Right) -->
-        <g data-diagram-element="node" id="node-loop-detector">
-          <rect class="node-shape node-shape--danger" x="636" y="80" width="94" height="74"/>
-          <text class="node-label" x="648" y="104">Loop</text>
-          <text class="node-label" x="648" y="120">Detector</text>
-          <text class="node-tag" x="648" y="140">Fail &gt;=2</text>
-        </g>
-
-        <!-- NODE: SQLite Storage (Lower Left) -->
-        <g data-diagram-element="node" id="node-sqlite">
-          <rect class="node-shape" x="290" y="345" width="200" height="66"/>
-          <text class="node-tag" x="306" y="365">Pure Go</text>
-          <text class="node-label" x="306" y="383">SQLite Storage</text>
-          <text class="node-sublabel" x="306" y="399">~/.mcpop/data.db (WAL)</text>
-        </g>
-
-        <!-- NODE: Dashboard & SSE Hub (Lower Right) -->
-        <g data-diagram-element="node" id="node-dashboard-hub">
-          <rect class="node-shape" x="530" y="345" width="200" height="66"/>
-          <text class="node-tag" x="546" y="365">HTTP :4040</text>
-          <text class="node-label" x="546" y="383">Dashboard &amp; SSE</text>
-          <text class="node-sublabel" x="546" y="399">Real-time trace stream</text>
-        </g>
-
-        <!-- NODE: Target MCP Subprocess -->
-        <g data-diagram-element="node" id="node-target-server">
+        <!-- STEP 3: Target Server Node -->
+        <g class="step step-3" data-diagram-element="node" id="node-target-server">
           <rect class="node-shape" x="790" y="200" width="190" height="84"/>
           <text class="node-tag" x="806" y="222">Child Process</text>
           <text class="node-label" x="806" y="244">Target MCP Server</text>
           <text class="node-sublabel" x="806" y="264">Python / Node / Go Tools</text>
         </g>
 
-        <!-- NODE: 1-Click Replay -->
-        <g data-diagram-element="node" id="node-replay-runner">
+        <!-- STEP 4: Target -> Proxy Response Line -->
+        <line class="step step-4 edge edge--fast" data-diagram-element="edge" id="edge-target-proxy"
+              x1="790" y1="255" x2="620" y2="255" marker-end="url(#arrow)"/>
+        <text class="step step-4 edge-label edge-label--fast" x="705" y="269" text-anchor="middle">result/error</text>
+
+        <!-- STEP 4: Proxy -> Client Response Line -->
+        <line class="step step-4 edge edge--fast" data-diagram-element="edge" id="edge-proxy-client"
+              x1="400" y1="255" x2="230" y2="255" marker-end="url(#arrow)"/>
+        <text class="step step-4 edge-label edge-label--fast" x="315" y="269" text-anchor="middle">stdout</text>
+
+        <!-- STEP 5: Async Event Channel to Core -->
+        <line class="step step-5 edge edge--async flow-pulse" data-diagram-element="edge" id="edge-proxy-core"
+              x1="510" y1="200" x2="510" y2="154" marker-end="url(#arrow)"/>
+        <text class="step step-5 edge-label" x="518" y="180">chan event</text>
+
+        <!-- STEP 5: Focal Core Heuristics Engine -->
+        <g class="step step-5" data-diagram-element="node" id="node-mcpop-core">
+          <rect class="node-shape node-shape--focal" x="400" y="80" width="220" height="74"/>
+          <text class="node-tag" x="416" y="102">Focal Component</text>
+          <text class="node-label" x="416" y="122">Heuristics Engine</text>
+          <text class="node-sublabel" x="416" y="140">Async Worker Goroutine</text>
+        </g>
+
+        <!-- STEP 6: Schema & Lag Validator -->
+        <line class="step step-6 edge edge--warning" data-diagram-element="edge" id="edge-core-schema"
+              x1="400" y1="117" x2="384" y2="117" marker-end="url(#arrow)"/>
+        <g class="step step-6" data-diagram-element="node" id="node-schema-validator">
+          <rect class="node-shape node-shape--warning" x="290" y="80" width="94" height="74"/>
+          <text class="node-label" x="302" y="104">Schema</text>
+          <text class="node-label" x="302" y="120">&amp; Lag</text>
+          <text class="node-tag" x="302" y="140">Audit</text>
+        </g>
+
+        <!-- STEP 6: Loop Detector -->
+        <line class="step step-6 edge edge--danger" data-diagram-element="edge" id="edge-core-loop"
+              x1="620" y1="117" x2="636" y2="117" marker-end="url(#arrow)"/>
+        <g class="step step-6" data-diagram-element="node" id="node-loop-detector">
+          <rect class="node-shape node-shape--danger" x="636" y="80" width="94" height="74"/>
+          <text class="node-label" x="648" y="104">Loop</text>
+          <text class="node-label" x="648" y="120">Detector</text>
+          <text class="node-tag" x="648" y="140">Fail &gt;=2</text>
+        </g>
+
+        <!-- STEP 7: Core -> SQLite Store -->
+        <path class="step step-7 edge edge--async" data-diagram-element="edge" id="edge-core-sqlite"
+              d="M 440 154 V 315 H 390 V 345" marker-end="url(#arrow)"/>
+        <text class="step step-7 edge-label" x="350" y="332" text-anchor="middle">write trace</text>
+        <g class="step step-7" data-diagram-element="node" id="node-sqlite">
+          <rect class="node-shape" x="290" y="345" width="200" height="66"/>
+          <text class="node-tag" x="306" y="365">Pure Go</text>
+          <text class="node-label" x="306" y="383">SQLite Storage</text>
+          <text class="node-sublabel" x="306" y="399">~/.mcpop/data.db (WAL)</text>
+        </g>
+
+        <!-- STEP 7: Core -> Dashboard SSE Hub -->
+        <path class="step step-7 edge edge--async flow-pulse" data-diagram-element="edge" id="edge-core-dashboard"
+              d="M 580 154 V 315 H 630 V 345" marker-end="url(#arrow)"/>
+        <text class="step step-7 edge-label" x="668" y="332" text-anchor="middle">SSE broadcast</text>
+        <g class="step step-7" data-diagram-element="node" id="node-dashboard-hub">
+          <rect class="node-shape" x="530" y="345" width="200" height="66"/>
+          <text class="node-tag" x="546" y="365">HTTP :4040</text>
+          <text class="node-label" x="546" y="383">Dashboard &amp; SSE</text>
+          <text class="node-sublabel" x="546" y="399">Real-time trace stream</text>
+        </g>
+
+        <!-- STEP 8: Dashboard -> Replay Runner -->
+        <line class="step step-8 edge" data-diagram-element="edge" id="edge-dashboard-replay"
+              x1="730" y1="378" x2="790" y2="378" marker-end="url(#arrow)"/>
+        <text class="step step-8 edge-label" x="760" y="370" text-anchor="middle">invoke</text>
+        <g class="step step-8" data-diagram-element="node" id="node-replay-runner">
           <rect class="node-shape node-shape--success" x="790" y="345" width="190" height="66"/>
           <text class="node-tag" x="806" y="365">Debug Mode</text>
           <text class="node-label" x="806" y="383">1-Click Replay</text>
           <text class="node-sublabel" x="806" y="399">Isolated subshell re-exec</text>
         </g>
-
-        <!-- CONNECTORS (Strictly Orthogonal & Independently Traceable) -->
-
-        <!-- Client -> Proxy (Fast Path Request) -->
-        <line class="edge edge--fast" data-diagram-element="edge" id="edge-client-proxy"
-              x1="230" y1="230" x2="400" y2="230" marker-end="url(#arrow)"/>
-        <text class="edge-label edge-label--fast" x="315" y="222" text-anchor="middle">stdin</text>
-
-        <!-- Proxy -> Client (Fast Path Response) -->
-        <line class="edge edge--fast" data-diagram-element="edge" id="edge-proxy-client"
-              x1="400" y1="255" x2="230" y2="255" marker-end="url(#arrow)"/>
-        <text class="edge-label edge-label--fast" x="315" y="269" text-anchor="middle">stdout</text>
-
-        <!-- Proxy -> Target (Direct Pass-Through Request) -->
-        <line class="edge edge--fast" data-diagram-element="edge" id="edge-proxy-target"
-              x1="620" y1="230" x2="790" y2="230" marker-end="url(#arrow)"/>
-        <text class="edge-label edge-label--fast" x="705" y="222" text-anchor="middle">pass-through</text>
-
-        <!-- Target -> Proxy (Direct Pass-Through Response) -->
-        <line class="edge edge--fast" data-diagram-element="edge" id="edge-target-proxy"
-              x1="790" y1="255" x2="620" y2="255" marker-end="url(#arrow)"/>
-        <text class="edge-label edge-label--fast" x="705" y="269" text-anchor="middle">result/error</text>
-
-        <!-- Proxy -> Core (Async Channel Event Queue Upward) -->
-        <line class="edge edge--async" data-diagram-element="edge" id="edge-proxy-core"
-              x1="510" y1="200" x2="510" y2="154" marker-end="url(#arrow)"/>
-        <text class="edge-label" x="518" y="180">chan event</text>
-
-        <!-- Core -> Schema Validator (Left) -->
-        <line class="edge edge--warning" data-diagram-element="edge" id="edge-core-schema"
-              x1="400" y1="117" x2="384" y2="117" marker-end="url(#arrow)"/>
-
-        <!-- Core -> Loop Detector (Right) -->
-        <line class="edge edge--danger" data-diagram-element="edge" id="edge-core-loop"
-              x1="620" y1="117" x2="636" y2="117" marker-end="url(#arrow)"/>
-
-        <!-- Core -> SQLite (Downward Left Path) -->
-        <path class="edge edge--async" data-diagram-element="edge" id="edge-core-sqlite"
-              d="M 440 154 V 315 H 390 V 345" marker-end="url(#arrow)"/>
-        <text class="edge-label" x="350" y="332" text-anchor="middle">write trace</text>
-
-        <!-- Core -> Dashboard (Downward Right Path) -->
-        <path class="edge edge--async" data-diagram-element="edge" id="edge-core-dashboard"
-              d="M 580 154 V 315 H 630 V 345" marker-end="url(#arrow)"/>
-        <text class="edge-label" x="668" y="332" text-anchor="middle">SSE broadcast</text>
-
-        <!-- Dashboard -> Replay Runner -->
-        <line class="edge" data-diagram-element="edge" id="edge-dashboard-replay"
-              x1="730" y1="378" x2="790" y2="378" marker-end="url(#arrow)"/>
-        <text class="edge-label" x="760" y="370" text-anchor="middle">invoke</text>
       </svg>
     </div>
   </div>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    var controls = document.querySelector('[data-diagram-controls]');
+    var status = controls && controls.querySelector('.status');
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    function setStatic(reason) {
+      root.removeAttribute('data-motion');
+      root.removeAttribute('data-playing');
+      if (controls) controls.hidden = true;
+      if (status) status.textContent = reason;
+    }
+
+    function enableMotion() {
+      root.setAttribute('data-motion', 'on');
+      root.setAttribute('data-playing', 'true');
+      if (controls) controls.hidden = false;
+      if (status) status.textContent = 'Streaming animation...';
+    }
+
+    if (reduced.matches) {
+      setStatic('Reduced motion: showing complete diagram.');
+    } else {
+      enableMotion();
+    }
+
+    var onChange = function (event) {
+      if (event.matches) setStatic('Reduced motion: showing complete diagram.');
+      else enableMotion();
+    };
+    if (typeof reduced.addEventListener === 'function') reduced.addEventListener('change', onChange);
+
+    if (controls) {
+      controls.addEventListener('click', function (event) {
+        var action = event.target && event.target.getAttribute('data-action');
+        if (action === 'replay') {
+          root.removeAttribute('data-playing');
+          void document.body.offsetWidth; // Force reflow
+          root.setAttribute('data-playing', 'true');
+          if (status) status.textContent = 'Replaying stream...';
+        } else if (action === 'toggle') {
+          var playing = root.getAttribute('data-playing') === 'true';
+          if (playing) {
+            root.removeAttribute('data-motion');
+            if (status) status.textContent = 'Paused: complete diagram.';
+          } else {
+            enableMotion();
+          }
+          event.target.textContent = playing ? 'Play' : 'Pause';
+        }
+      });
+    }
+  })();
+</script>
 </body>
 </html>
