@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// Embedded ultra-lean Neutral B&W Dashboard
+// Embedded premium lean Neutral B&W Dashboard with Design:OS Visuals
 const DashboardHTML = `<!DOCTYPE html>
 <html lang="en" class="light">
 <head>
@@ -67,8 +67,8 @@ const DashboardHTML = `<!DOCTYPE html>
 
     <!-- Actions & Controls -->
     <div class="flex items-center space-x-2.5">
-      <!-- Live SSE Status Indicator -->
-      <div class="flex items-center space-x-1.5 text-xs text-neutral-600 dark:text-neutral-400 px-2 py-1 rounded bg-neutral-100 dark:bg-neutral-800 font-mono text-[11px]">
+      <!-- Live SSE Status -->
+      <div class="flex items-center space-x-1.5 text-neutral-600 dark:text-neutral-400 px-2 py-1 rounded bg-neutral-100 dark:bg-neutral-800 font-mono text-[11px]">
         <span class="w-1.5 h-1.5 rounded-full bg-neutral-950 dark:bg-white animate-pulse"></span>
         <span id="liveStatus">Live</span>
       </div>
@@ -96,24 +96,89 @@ const DashboardHTML = `<!DOCTYPE html>
 
     <!-- KPI Strip (Compact, High-Information Density) -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-      <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3">
+      <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3 shadow-2xs">
         <div class="text-[11px] text-neutral-500 font-medium uppercase tracking-wider">Total Calls</div>
         <div class="text-xl font-bold text-neutral-950 dark:text-white mt-1 font-mono" id="statTotalCalls">0</div>
       </div>
 
-      <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3">
+      <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3 shadow-2xs">
         <div class="text-[11px] text-neutral-500 font-medium uppercase tracking-wider">Reliability</div>
         <div class="text-xl font-bold text-neutral-950 dark:text-white mt-1 font-mono" id="statSuccessRate">100%</div>
       </div>
 
-      <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3">
+      <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3 shadow-2xs">
         <div class="text-[11px] text-neutral-500 font-medium uppercase tracking-wider">Avg Latency</div>
         <div class="text-xl font-bold text-neutral-950 dark:text-white mt-1 font-mono" id="statAvgLatency">0 ms</div>
       </div>
 
-      <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3">
+      <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3 shadow-2xs">
         <div class="text-[11px] text-neutral-500 font-medium uppercase tracking-wider">Silent Failures</div>
         <div class="text-xl font-bold text-neutral-950 dark:text-white mt-1 font-mono" id="statFailures">0</div>
+      </div>
+    </div>
+
+    <!-- Design:OS Lean Signal Track Diagram (Inline, Artful & Architectural) -->
+    <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs shadow-2xs">
+      <div class="flex items-center space-x-2 font-mono">
+        <span class="w-2 h-2 rounded-full bg-neutral-950 dark:bg-white animate-pulse"></span>
+        <span class="font-bold text-neutral-950 dark:text-white text-[11px] uppercase tracking-wider">Topology</span>
+      </div>
+
+      <div class="flex items-center space-x-2 text-[11px] font-mono text-neutral-600 dark:text-neutral-300 overflow-x-auto py-0.5">
+        <div class="flex items-center space-x-1.5 bg-neutral-100 dark:bg-neutral-800 px-2.5 py-1 rounded border border-neutral-200 dark:border-neutral-700">
+          <i class="ph ph-robot text-[14px]"></i>
+          <span>Client (stdio)</span>
+        </div>
+        <span class="text-neutral-400 dark:text-neutral-600">→</span>
+        <div class="flex items-center space-x-1.5 bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 px-2.5 py-1 rounded font-bold shadow-xs">
+          <i class="ph ph-shield-check text-[14px]"></i>
+          <span>MCPOp Interceptor</span>
+        </div>
+        <span class="text-neutral-400 dark:text-neutral-600">→</span>
+        <div class="flex items-center space-x-1.5 bg-neutral-100 dark:bg-neutral-800 px-2.5 py-1 rounded border border-neutral-200 dark:border-neutral-700">
+          <i class="ph ph-hard-drives text-[14px]"></i>
+          <span id="pipelineTarget">Target Server</span>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-3 text-[11px] text-neutral-500 font-mono">
+        <span>Overhead: <strong class="text-neutral-900 dark:text-neutral-100">&lt;0.5ms</strong></span>
+        <span>Spec: <strong class="text-neutral-900 dark:text-neutral-100">JSON-RPC 2.0</strong></span>
+      </div>
+    </div>
+
+    <!-- Design:OS Lean Visual Telemetry & Analytics Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
+      <!-- Latency Timeline Line Chart (2 Cols) -->
+      <div class="lg:col-span-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3.5 shadow-2xs">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center space-x-2">
+            <i class="ph ph-chart-line-up text-[16px] text-neutral-950 dark:text-white"></i>
+            <span class="font-bold text-xs uppercase tracking-wider text-neutral-950 dark:text-white">Execution Latency (ms)</span>
+          </div>
+          <div class="flex items-center space-x-3 text-[11px] font-mono text-neutral-500">
+            <span>p50: <strong id="valP50" class="text-neutral-950 dark:text-white">0ms</strong></span>
+            <span>p90: <strong id="valP90" class="text-neutral-950 dark:text-white">0ms</strong></span>
+            <span>p99: <strong id="valP99" class="text-neutral-950 dark:text-white">0ms</strong></span>
+          </div>
+        </div>
+        <div class="h-32 w-full">
+          <canvas id="latencyChart" role="img" aria-label="Latency Timeline"></canvas>
+        </div>
+      </div>
+
+      <!-- Tool Share Mini Doughnut Chart (1 Col) -->
+      <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3.5 shadow-2xs flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-1">
+          <div class="flex items-center space-x-2">
+            <i class="ph ph-chart-pie-slice text-[16px] text-neutral-950 dark:text-white"></i>
+            <span class="font-bold text-xs uppercase tracking-wider text-neutral-950 dark:text-white">Tool Invocations</span>
+          </div>
+          <span class="text-[11px] font-mono text-neutral-500" id="distinctToolCount">0 tools</span>
+        </div>
+        <div class="h-32 w-full flex items-center justify-center">
+          <canvas id="toolPieChart" role="img" aria-label="Tool Invocation Share"></canvas>
+        </div>
       </div>
     </div>
 
@@ -122,69 +187,51 @@ const DashboardHTML = `<!DOCTYPE html>
       <div id="failureAlertsList" class="space-y-2"></div>
     </div>
 
-    <!-- Core Layout: Waterfall Table + Latency Sparkline -->
-    <div class="space-y-4">
+    <!-- Realtime Traces Waterfall Table -->
+    <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg overflow-hidden shadow-2xs">
       
-      <!-- Realtime Traces Waterfall -->
-      <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg overflow-hidden shadow-2xs">
-        
-        <!-- Table Control Toolbar -->
-        <div class="p-3 border-b border-neutral-200 dark:border-neutral-800 flex flex-wrap items-center justify-between gap-3">
-          <div class="flex items-center space-x-2">
-            <span class="font-bold text-xs uppercase tracking-wider text-neutral-950 dark:text-white">Tool Calls Waterfall</span>
-            <span id="traceCountBadge" class="text-[11px] font-mono text-neutral-500 bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded">0</span>
-          </div>
-
-          <div class="flex items-center space-x-2">
-            <!-- Filter Tabs -->
-            <div class="flex items-center bg-neutral-100 dark:bg-neutral-800 p-0.5 rounded text-xs" role="group">
-              <button onclick="setFilter('all')" id="filterAll" class="px-2.5 py-1 rounded bg-white dark:bg-neutral-700 shadow-2xs text-neutral-950 dark:text-white font-bold">All</button>
-              <button onclick="setFilter('errors')" id="filterErrors" class="px-2.5 py-1 rounded text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white font-medium">Errors</button>
-              <button onclick="setFilter('slow')" id="filterSlow" class="px-2.5 py-1 rounded text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white font-medium">Slow</button>
-            </div>
-
-            <!-- Search -->
-            <div class="relative">
-              <input id="searchTraces" oninput="renderTraces()" type="text" placeholder="Filter tool..." aria-label="Filter tools" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-700 text-xs rounded px-2.5 py-1 text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 focus:outline-none focus:ring-1 focus:ring-neutral-950 dark:focus:ring-white w-40">
-            </div>
-
-            <!-- Toggle Chart Button -->
-            <button onclick="toggleChart()" id="btnToggleChart" class="px-2.5 py-1 rounded border border-neutral-200 dark:border-neutral-700 text-xs text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white flex items-center space-x-1 font-medium">
-              <i class="ph ph-chart-line text-[14px]"></i>
-              <span id="chartToggleText">Analytics</span>
-            </button>
-          </div>
+      <!-- Table Control Toolbar -->
+      <div class="p-3 border-b border-neutral-200 dark:border-neutral-800 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center space-x-2">
+          <span class="font-bold text-xs uppercase tracking-wider text-neutral-950 dark:text-white">Live Tool Traces</span>
+          <span id="traceCountBadge" class="text-[11px] font-mono text-neutral-500 bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded font-semibold">0</span>
         </div>
 
-        <!-- Collapsible Analytics Chart Strip -->
-        <div id="analyticsChartWrapper" class="hidden p-4 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-950/50">
-          <div class="h-36 w-full">
-            <canvas id="latencyChart" role="img" aria-label="Latency Timeline"></canvas>
+        <div class="flex items-center space-x-2">
+          <!-- Filter Tabs -->
+          <div class="flex items-center bg-neutral-100 dark:bg-neutral-800 p-0.5 rounded text-xs" role="group">
+            <button onclick="setFilter('all')" id="filterAll" class="px-2.5 py-1 rounded bg-white dark:bg-neutral-700 shadow-2xs text-neutral-950 dark:text-white font-bold">All</button>
+            <button onclick="setFilter('errors')" id="filterErrors" class="px-2.5 py-1 rounded text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white font-medium">Errors</button>
+            <button onclick="setFilter('slow')" id="filterSlow" class="px-2.5 py-1 rounded text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white font-medium">Slow</button>
           </div>
-        </div>
 
-        <!-- Traces Table -->
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs" role="table">
-            <thead class="bg-neutral-50 dark:bg-neutral-950/80 text-neutral-500 dark:text-neutral-400 border-b border-neutral-200 dark:border-neutral-800 font-semibold">
-              <tr>
-                <th scope="col" class="py-2.5 px-4 w-20">Status</th>
-                <th scope="col" class="py-2.5 px-4 w-44">Tool Name</th>
-                <th scope="col" class="py-2.5 px-4">Arguments Preview</th>
-                <th scope="col" class="py-2.5 px-4 w-28">Latency</th>
-                <th scope="col" class="py-2.5 px-4 w-28">Time</th>
-                <th scope="col" class="py-2.5 px-4 text-right w-24">Action</th>
-              </tr>
-            </thead>
-            <tbody id="traceTableBody" class="divide-y divide-neutral-100 dark:divide-neutral-800/80 font-mono">
-              <tr>
-                <td colspan="6" class="py-10 text-center text-neutral-400 font-sans">No tool calls recorded yet.</td>
-              </tr>
-            </tbody>
-          </table>
+          <!-- Search -->
+          <div class="relative">
+            <input id="searchTraces" oninput="renderTraces()" type="text" placeholder="Search tools..." aria-label="Search tools" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-700 text-xs rounded px-2.5 py-1 text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 focus:outline-none focus:ring-1 focus:ring-neutral-950 dark:focus:ring-white w-40">
+          </div>
         </div>
       </div>
 
+      <!-- Traces Table -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs" role="table">
+          <thead class="bg-neutral-50 dark:bg-neutral-950/80 text-neutral-500 dark:text-neutral-400 border-b border-neutral-200 dark:border-neutral-800 font-semibold">
+            <tr>
+              <th scope="col" class="py-2.5 px-4 w-20">Status</th>
+              <th scope="col" class="py-2.5 px-4 w-44">Tool Name</th>
+              <th scope="col" class="py-2.5 px-4">Arguments Payload</th>
+              <th scope="col" class="py-2.5 px-4 w-32">Latency</th>
+              <th scope="col" class="py-2.5 px-4 w-28">Timestamp</th>
+              <th scope="col" class="py-2.5 px-4 text-right w-24">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="traceTableBody" class="divide-y divide-neutral-100 dark:divide-neutral-800/80 font-mono">
+            <tr>
+              <td colspan="6" class="py-10 text-center text-neutral-400 font-sans">No tool calls recorded yet.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
   </main>
@@ -255,7 +302,7 @@ const DashboardHTML = `<!DOCTYPE html>
     let currentModalTrace = null;
     let currentFilter = 'all';
     let latencyChartInstance = null;
-    let showChart = false;
+    let toolPieChartInstance = null;
 
     function toggleTheme() {
       const html = document.documentElement;
@@ -270,26 +317,12 @@ const DashboardHTML = `<!DOCTYPE html>
         document.getElementById('themeBtn').innerHTML = '<i class="ph ph-sun text-[14px]"></i>';
         localStorage.setItem('theme', 'dark');
       }
-      if (showChart) renderChart();
+      renderCharts();
     }
 
     if (localStorage.getItem('theme') === 'dark') {
       document.documentElement.classList.add('dark');
       document.documentElement.classList.remove('light');
-    }
-
-    function toggleChart() {
-      showChart = !showChart;
-      const wrap = document.getElementById('analyticsChartWrapper');
-      const text = document.getElementById('chartToggleText');
-      if (showChart) {
-        wrap.classList.remove('hidden');
-        text.textContent = 'Hide Chart';
-        renderChart();
-      } else {
-        wrap.classList.add('hidden');
-        text.textContent = 'Analytics';
-      }
     }
 
     async function init() {
@@ -351,7 +384,7 @@ const DashboardHTML = `<!DOCTYPE html>
         renderStats(stats);
         renderFailures();
         renderTraces();
-        if (showChart) renderChart();
+        renderCharts();
       } catch (err) {
         console.error('Failed to refresh data:', err);
       }
@@ -367,6 +400,7 @@ const DashboardHTML = `<!DOCTYPE html>
       const curr = sessions.find(s => s.id === currentSessionId);
       if (curr) {
         document.getElementById('headerCommand').textContent = curr.command;
+        document.getElementById('pipelineTarget').textContent = curr.command.split(' ')[0] || 'Target Server';
       }
     }
 
@@ -442,11 +476,20 @@ const DashboardHTML = `<!DOCTYPE html>
           argsPreview = argsPreview.substring(0, 50) + '...';
         }
 
+        let barWidth = Math.min(100, Math.max(8, (t.latency_ms / 3000) * 100));
+
         tr.innerHTML = 
           '<td class="py-2.5 px-4">' + statusBadge + '</td>' +
           '<td class="py-2.5 px-4 font-bold text-neutral-950 dark:text-white">' + t.tool_name + '</td>' +
           '<td class="py-2.5 px-4 text-neutral-500 truncate max-w-sm">' + argsPreview + '</td>' +
-          '<td class="py-2.5 px-4 font-mono font-bold text-neutral-900 dark:text-neutral-100">' + t.latency_ms + ' ms</td>' +
+          '<td class="py-2.5 px-4 font-mono">' +
+            '<div class="flex items-center space-x-2">' +
+              '<span class="font-bold text-neutral-900 dark:text-neutral-100">' + t.latency_ms + 'ms</span>' +
+              '<div class="w-10 bg-neutral-200 dark:bg-neutral-800 h-1 rounded-full overflow-hidden" aria-hidden="true">' +
+                '<div class="bg-neutral-950 dark:bg-neutral-300 h-full rounded-full" style="width: ' + barWidth + '%"></div>' +
+              '</div>' +
+            '</div>' +
+          '</td>' +
           '<td class="py-2.5 px-4 text-neutral-400 text-[11px]">' + new Date(t.created_at).toLocaleTimeString() + '</td>' +
           '<td class="py-2.5 px-4 text-right space-x-1 font-sans">' +
             '<button onclick="inspectTrace(\'' + t.id + '\')" aria-label="Inspect" class="px-2.5 py-1 rounded border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-900 dark:text-neutral-100 text-[11px] font-semibold">Inspect</button>' +
@@ -459,31 +502,42 @@ const DashboardHTML = `<!DOCTYPE html>
       });
     }
 
-    function renderChart() {
+    function renderCharts() {
       const isDark = document.documentElement.classList.contains('dark');
       const gridColor = isDark ? 'rgba(63, 63, 70, 0.3)' : 'rgba(228, 228, 231, 0.8)';
       const textColor = isDark ? '#a1a1aa' : '#71717a';
       const lineColor = isDark ? '#ffffff' : '#18181b';
 
-      const orderedTraces = [...traces].reverse();
-      const labels = orderedTraces.map((t, i) => '#' + (i + 1) + ' ' + t.tool_name);
-      const latencies = orderedTraces.map(t => t.latency_ms);
+      // Calculate Percentiles
+      const latencies = traces.map(t => t.latency_ms).sort((a, b) => a - b);
+      if (latencies.length > 0) {
+        const p50 = latencies[Math.floor(latencies.length * 0.50)] || 0;
+        const p90 = latencies[Math.floor(latencies.length * 0.90)] || 0;
+        const p99 = latencies[Math.floor(latencies.length * 0.99)] || 0;
+        document.getElementById('valP50').textContent = p50 + 'ms';
+        document.getElementById('valP90').textContent = p90 + 'ms';
+        document.getElementById('valP99').textContent = p99 + 'ms';
+      }
 
-      const ctx = document.getElementById('latencyChart').getContext('2d');
+      // 1. Latency Timeline
+      const orderedTraces = [...traces].reverse();
+      const labels = orderedTraces.map((t, i) => '#' + (i + 1));
+      const latValues = orderedTraces.map(t => t.latency_ms);
+
+      const ctx1 = document.getElementById('latencyChart').getContext('2d');
       if (latencyChartInstance) latencyChartInstance.destroy();
 
-      latencyChartInstance = new Chart(ctx, {
+      latencyChartInstance = new Chart(ctx1, {
         type: 'line',
         data: {
           labels: labels,
           datasets: [{
-            label: 'Latency (ms)',
-            data: latencies,
+            data: latValues,
             borderColor: lineColor,
-            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(24, 24, 27, 0.03)',
+            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(24, 24, 27, 0.04)',
             borderWidth: 1.5,
             fill: true,
-            tension: 0.2,
+            tension: 0.25,
             pointRadius: 2.5,
             pointBackgroundColor: lineColor
           }]
@@ -495,14 +549,53 @@ const DashboardHTML = `<!DOCTYPE html>
           scales: {
             x: {
               grid: { color: gridColor },
-              ticks: { color: textColor, font: { family: 'Be Vietnam Pro', size: 11 } }
+              ticks: { color: textColor, font: { family: 'Be Vietnam Pro', size: 10 } }
             },
             y: {
               grid: { color: gridColor },
-              ticks: { color: textColor, font: { family: 'Be Vietnam Pro', size: 11 } },
+              ticks: { color: textColor, font: { family: 'Be Vietnam Pro', size: 10 } },
               beginAtZero: true
             }
           }
+        }
+      });
+
+      // 2. Tool Share Doughnut
+      const toolCounts = {};
+      traces.forEach(t => {
+        toolCounts[t.tool_name] = (toolCounts[t.tool_name] || 0) + 1;
+      });
+
+      const pieLabels = Object.keys(toolCounts);
+      const pieData = Object.values(toolCounts);
+      document.getElementById('distinctToolCount').textContent = pieLabels.length + ' distinct';
+
+      const ctx2 = document.getElementById('toolPieChart').getContext('2d');
+      if (toolPieChartInstance) toolPieChartInstance.destroy();
+
+      toolPieChartInstance = new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+          labels: pieLabels,
+          datasets: [{
+            data: pieData,
+            backgroundColor: isDark 
+              ? ['#ffffff', '#d4d4d8', '#a1a1aa', '#71717a', '#3f3f46']
+              : ['#18181b', '#3f3f46', '#71717a', '#a1a1aa', '#e4e4e7'],
+            borderWidth: 1.5,
+            borderColor: isDark ? '#09090b' : '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: { color: textColor, boxWidth: 8, font: { family: 'Be Vietnam Pro', size: 10 } }
+            }
+          },
+          cutout: '72%'
         }
       });
     }
