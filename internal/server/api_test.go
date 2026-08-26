@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
@@ -42,7 +43,7 @@ func setupTestServer(t *testing.T) (*server.Server, *storage.Repository, string)
 	sessionID := "test-session-api"
 	if err := repo.CreateSession(context.Background(), &storage.Session{
 		ID:      sessionID,
-		Command: "python3 " + mockServerPath(t),
+		Command: fmt.Sprintf("python3 %q", mockServerPath(t)),
 	}); err != nil {
 		t.Fatalf("failed to create test session: %v", err)
 	}

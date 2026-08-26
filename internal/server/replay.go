@@ -150,11 +150,58 @@ func splitCommand(command string) (string, []string, error) {
 		return "", nil, fmt.Errorf("command is required")
 	}
 
-	parts := strings.Fields(command)
-	for _, part := range parts {
-		if strings.ContainsAny(part, ";|&$`<>(){}") {
+	var parts []string
+	var current strings.Builder
+	inQuote := rune(0)
+	escaped := false
+
+	for _, r := range command {
+		if escaped {
+			current.WriteRune(r)
+			escaped = false
+			continue
+		}
+		if r == '\\' {
+			escaped = true
+			continue
+		}
+		if inQuote != 0 {
+			if r == inQuote {
+				inQuote = 0
+			} else {
+				current.WriteRune(r)
+			}
+			continue
+		}
+		if r == '"' || r == '\'' {
+			inQuote = r
+			continue
+		}
+		if unicode.IsSpace(r) {
+			if current.Len() > 0 {
+				parts = append(parts, current.String())
+				current.Reset()
+			}
+			continue
+		}
+		if strings.ContainsRune(";|&$`<>(){}", r) {
 			return "", nil, fmt.Errorf("command contains shell metacharacters")
 		}
+		current.WriteRune(r)
+	}
+
+	if inQuote != 0 {
+		return "", nil, fmt.Errorf("unclosed quote in command")
+	}
+	if current.Len() > 0 {
+		parts = append(parts, current.String())
+	}
+
+	if len(parts) == 0 {
+		return "", nil, fmt.Errorf("command is required")
+	}
+
+	for _, part := range parts {
 		if strings.Contains(part, "..") {
 			return "", nil, fmt.Errorf("command contains parent-directory path")
 		}

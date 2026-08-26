@@ -36,6 +36,19 @@ func TestSplitCommandParsesSimpleArgs(t *testing.T) {
 	}
 }
 
+func TestSplitCommandParsesQuotedArgs(t *testing.T) {
+	name, args, err := splitCommand(`python3 "/path with spaces/server.py" 'arg with spaces'`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if name != "python3" {
+		t.Fatalf("name=%s", name)
+	}
+	if len(args) != 2 || args[0] != "/path with spaces/server.py" || args[1] != "arg with spaces" {
+		t.Fatalf("args=%v", args)
+	}
+}
+
 func TestExecuteReplayRequiresToolName(t *testing.T) {
 	_, err := ExecuteReplay(context.Background(), ReplayRequest{Command: "python3 server.py"})
 	if err == nil || !strings.Contains(err.Error(), "tool_name") {
