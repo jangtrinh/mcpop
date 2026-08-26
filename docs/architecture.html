@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCPOp — Architecture Diagram</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            neutral: {
+              50: '#fafafa',
+              100: '#f4f4f5',
+              200: '#e4e4e7',
+              300: '#d4d4d8',
+              400: '#a1a1aa',
+              500: '#71717a',
+              600: '#52525b',
+              700: '#3f3f46',
+              800: '#27272a',
+              900: '#18181b',
+              950: '#09090b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Be Vietnam Pro', -apple-system, sans-serif; font-size: 13px; letter-spacing: -0.01em; }
+    code, pre, .font-mono { font-family: 'JetBrains Mono', monospace; }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 9999px; }
+    .dark ::-webkit-scrollbar-thumb { background: #3f3f46; }
+
+    @keyframes pulse-flow {
+      0% { stroke-dashoffset: 24; }
+      100% { stroke-dashoffset: 0; }
+    }
+    .flow-line {
+      stroke-dasharray: 6 6;
+      animation: pulse-flow 1.2s linear infinite;
+    }
+    .flow-line-reverse {
+      stroke-dasharray: 6 6;
+      animation: pulse-flow 1.2s linear infinite reverse;
+    }
+  </style>
+</head>
+<body class="bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 min-h-screen flex flex-col antialiased selection:bg-neutral-900 selection:text-white dark:selection:bg-white dark:selection:text-black">
+
+  <!-- Lean Header -->
+  <header class="border-b border-neutral-200 dark:border-neutral-800 bg-white/90 dark:bg-neutral-900/90 backdrop-blur sticky top-0 z-30 px-6 py-3 flex items-center justify-between shadow-2xs">
+    <div class="flex items-center space-x-3">
+      <div class="w-8 h-8 rounded-lg bg-neutral-950 dark:bg-white text-white dark:text-neutral-950 flex items-center justify-center font-bold shadow-xs">
+        <i class="ph-bold ph-terminal text-[16px]"></i>
+      </div>
+      <div>
+        <div class="flex items-center space-x-2">
+          <span class="font-extrabold tracking-tight text-neutral-950 dark:text-white text-base">MCPOp</span>
+          <span class="text-[11px] font-semibold bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700 px-2 py-0.5 rounded">Architecture Spec</span>
+          <span class="text-[11px] font-mono text-neutral-500 bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded">v0.1.0</span>
+        </div>
+        <p class="text-xs text-neutral-500 font-medium">Zero-Overhead Transparent Stdio Proxy & Heuristic Observability Engine</p>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="flex items-center space-x-3">
+      <div class="flex items-center space-x-2 text-xs bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 px-2.5 py-1 rounded text-emerald-700 dark:text-emerald-400 font-mono text-[11px] font-medium">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
+        </span>
+        <span>Overhead &lt;0.5ms</span>
+      </div>
+
+      <button onclick="toggleTheme()" id="themeBtn" aria-label="Toggle Theme" class="w-8 h-8 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 flex items-center justify-center transition shadow-2xs">
+        <i class="ph ph-moon text-[16px]"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Canvas Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-6 space-y-6">
+
+    <!-- Top Architecture Summary Strip -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 font-mono text-xs">
+      <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-3 shadow-2xs">
+        <div class="text-[11px] text-neutral-500 uppercase tracking-wider font-semibold">1. Interception Layer</div>
+        <div class="font-bold text-neutral-950 dark:text-white mt-1">Non-blocking Stdio Pipes</div>
+        <div class="text-[11px] text-neutral-500 mt-0.5">Microsecond pass-through</div>
+      </div>
+      <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-3 shadow-2xs">
+        <div class="text-[11px] text-neutral-500 uppercase tracking-wider font-semibold">2. Async Event Bus</div>
+        <div class="font-bold text-neutral-950 dark:text-white mt-1">Buffered Queue (2048)</div>
+        <div class="text-[11px] text-neutral-500 mt-0.5">Decoupled parser goroutine</div>
+      </div>
+      <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-3 shadow-2xs">
+        <div class="text-[11px] text-neutral-500 uppercase tracking-wider font-semibold">3. Failure Heuristics</div>
+        <div class="font-bold text-neutral-950 dark:text-white mt-1">Loops, Schemas & Lag</div>
+        <div class="text-[11px] text-neutral-500 mt-0.5">Zero-latency evaluation</div>
+      </div>
+      <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-3 shadow-2xs">
+        <div class="text-[11px] text-neutral-500 uppercase tracking-wider font-semibold">4. Storage & UI</div>
+        <div class="font-bold text-neutral-950 dark:text-white mt-1">Pure Go SQLite + Web</div>
+        <div class="text-[11px] text-neutral-500 mt-0.5">Embedded SPA & SSE Hub</div>
+      </div>
+    </div>
+
+    <!-- Master Architecture Blueprint (Design:OS Visual Topology) -->
+    <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 shadow-xs relative overflow-hidden">
+      
+      <div class="flex items-center justify-between mb-6 border-b border-neutral-200 dark:border-neutral-800 pb-4">
+        <div>
+          <h2 class="text-sm font-bold text-neutral-950 dark:text-white uppercase tracking-wider flex items-center space-x-2">
+            <i class="ph-bold ph-network text-[18px]"></i>
+            <span>System Pipeline & Data Flow Blueprint</span>
+          </h2>
+          <p class="text-xs text-neutral-500 mt-0.5">Detailed interaction map between AI Client, Proxy Interceptor, Goroutines, Storage, and MCP Target.</p>
+        </div>
+        <div class="flex items-center space-x-3 text-[11px] font-mono text-neutral-500">
+          <span class="flex items-center space-x-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span><span>Synchronous Fast Path</span></span>
+          <span class="flex items-center space-x-1.5"><span class="w-2 h-2 rounded-full bg-neutral-400"></span><span>Asynchronous Worker</span></span>
+        </div>
+      </div>
+
+      <!-- 3-Tier Grid Diagram -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch relative">
+        
+        <!-- Tier 1: Client Environment (3 cols) -->
+        <div class="lg:col-span-3 flex flex-col space-y-4">
+          <div class="text-xs font-bold text-neutral-500 uppercase tracking-wider flex items-center space-x-1.5 font-mono">
+            <span>[01]</span>
+            <span>AI Client Layer</span>
+          </div>
+
+          <div class="flex-1 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 flex flex-col justify-between space-y-4">
+            <div class="space-y-3">
+              <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-lg bg-neutral-200 dark:bg-neutral-800 text-neutral-900 dark:text-white flex items-center justify-center">
+                  <i class="ph-bold ph-robot text-[20px]"></i>
+                </div>
+                <div>
+                  <h3 class="font-bold text-neutral-950 dark:text-white text-xs">AI Client Runtime</h3>
+                  <div class="text-[11px] text-neutral-500 font-mono">Claude Desktop / Cursor</div>
+                </div>
+              </div>
+
+              <div class="text-xs text-neutral-600 dark:text-neutral-400 space-y-2 border-t border-neutral-200 dark:border-neutral-800 pt-3">
+                <p>Initiates tool execution via standard JSON-RPC 2.0 requests over process pipes.</p>
+                <div class="bg-white dark:bg-neutral-900 p-2.5 rounded-lg border border-neutral-200 dark:border-neutral-800 font-mono text-[11px] space-y-1">
+                  <div class="text-neutral-500"># Process Invocation:</div>
+                  <div class="text-neutral-950 dark:text-white font-semibold">mcpop run -- &lt;cmd&gt;</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- IPC Pipe Indicators -->
+            <div class="space-y-2 border-t border-neutral-200 dark:border-neutral-800 pt-3 font-mono text-[11px]">
+              <div class="flex items-center justify-between text-neutral-600 dark:text-neutral-300 bg-white dark:bg-neutral-900 px-2.5 py-1.5 rounded border border-neutral-200 dark:border-neutral-800">
+                <span class="flex items-center space-x-1.5"><i class="ph ph-arrow-right text-[14px]"></i><span>stdin</span></span>
+                <span class="text-neutral-500">Client Requests</span>
+              </div>
+              <div class="flex items-center justify-between text-neutral-600 dark:text-neutral-300 bg-white dark:bg-neutral-900 px-2.5 py-1.5 rounded border border-neutral-200 dark:border-neutral-800">
+                <span class="flex items-center space-x-1.5"><i class="ph ph-arrow-left text-[14px]"></i><span>stdout</span></span>
+                <span class="text-neutral-500">Tool Responses</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tier 2: MCPOp Core Engine (6 cols - Hero Node) -->
+        <div class="lg:col-span-6 flex flex-col space-y-4">
+          <div class="text-xs font-bold text-neutral-950 dark:text-white uppercase tracking-wider flex items-center space-x-1.5 font-mono">
+            <span>[02]</span>
+            <span>MCPOp Single Binary Core</span>
+          </div>
+
+          <div class="flex-1 bg-gradient-to-b from-white to-neutral-50 dark:from-neutral-900 dark:to-neutral-950 border-2 border-neutral-950 dark:border-white rounded-xl p-5 flex flex-col space-y-4 shadow-sm">
+            
+            <!-- Component A: Transparent Fast-Path Stdio Proxy -->
+            <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3.5 space-y-2 shadow-2xs">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                  <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+                  <span class="font-bold text-xs text-neutral-950 dark:text-white font-mono">1. Zero-Overhead Stdio Proxy Layer</span>
+                </div>
+                <span class="text-[11px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded">Fast Path &lt;0.5ms</span>
+              </div>
+              <p class="text-xs text-neutral-600 dark:text-neutral-400">
+                Synchronously pumps raw bytes between stdin/stdout/stderr using non-blocking goroutines. Emits parsed frame events into background queue without stalling IPC.
+              </p>
+            </div>
+
+            <!-- Component B: Async Event Queue & Goroutine Dispatcher -->
+            <div class="flex items-center space-x-3 font-mono text-[11px] text-neutral-500 px-2">
+              <span>├── Channel Event Bus:</span>
+              <span class="bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 px-2 py-0.5 rounded font-semibold">chan ProxyEvent (cap: 2048)</span>
+              <span>──► Async Processing</span>
+            </div>
+
+            <!-- Component C: Heuristic Silent Failure Engine -->
+            <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3.5 space-y-2 shadow-2xs">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                  <i class="ph-bold ph-shield-check text-[16px] text-neutral-950 dark:text-white"></i>
+                  <span class="font-bold text-xs text-neutral-950 dark:text-white font-mono">2. Heuristic Failure Engine</span>
+                </div>
+                <span class="text-[11px] font-mono text-neutral-500">Real-Time Evaluation</span>
+              </div>
+
+              <!-- 3 Sub-Heuristic Rules -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-2 pt-1">
+                <div class="bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/60 rounded-lg p-2.5 space-y-1">
+                  <div class="font-bold text-rose-800 dark:text-rose-300 text-[11px] flex items-center space-x-1">
+                    <i class="ph ph-repeat text-[14px]"></i>
+                    <span>Loop Detector</span>
+                  </div>
+                  <div class="text-[10px] text-rose-700 dark:text-rose-400">Flags consecutive identical failed calls (&ge;2 times).</div>
+                </div>
+
+                <div class="bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 rounded-lg p-2.5 space-y-1">
+                  <div class="font-bold text-amber-800 dark:text-amber-300 text-[11px] flex items-center space-x-1">
+                    <i class="ph ph-code text-[14px]"></i>
+                    <span>Schema Validator</span>
+                  </div>
+                  <div class="text-[10px] text-amber-700 dark:text-amber-400">Verifies required arguments & types vs tools/list.</div>
+                </div>
+
+                <div class="bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg p-2.5 space-y-1">
+                  <div class="font-bold text-neutral-800 dark:text-neutral-200 text-[11px] flex items-center space-x-1">
+                    <i class="ph ph-hourglass text-[14px]"></i>
+                    <span>Slow Tool Profiler</span>
+                  </div>
+                  <div class="text-[10px] text-neutral-600 dark:text-neutral-400">Catches latency anomalies exceeding 5000ms.</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Component D: Storage & Server Sidecar -->
+            <div class="grid grid-cols-2 gap-3 pt-1">
+              <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3 space-y-1 shadow-2xs">
+                <div class="font-bold text-neutral-950 dark:text-white text-xs flex items-center space-x-1.5">
+                  <i class="ph ph-database text-[15px]"></i>
+                  <span>Pure Go SQLite</span>
+                </div>
+                <div class="text-[11px] text-neutral-500 font-mono">WAL Mode (~/.mcpop/data.db)</div>
+                <div class="text-[10px] text-neutral-400">Single-writer / multi-reader</div>
+              </div>
+
+              <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3 space-y-1 shadow-2xs">
+                <div class="font-bold text-neutral-950 dark:text-white text-xs flex items-center space-x-1.5">
+                  <i class="ph ph-broadcast text-[15px]"></i>
+                  <span>Live SSE Hub & REST</span>
+                </div>
+                <div class="text-[11px] text-neutral-500 font-mono">http://localhost:4040</div>
+                <div class="text-[10px] text-neutral-400">Instant event broadcast</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Tier 3: Target Server & Dashboard (3 cols) -->
+        <div class="lg:col-span-3 flex flex-col space-y-4">
+          <div class="text-xs font-bold text-neutral-500 uppercase tracking-wider flex items-center space-x-1.5 font-mono">
+            <span>[03]</span>
+            <span>Target MCP Server</span>
+          </div>
+
+          <div class="flex-1 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 flex flex-col justify-between space-y-4">
+            <div class="space-y-3">
+              <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-lg bg-neutral-200 dark:bg-neutral-800 text-neutral-900 dark:text-white flex items-center justify-center">
+                  <i class="ph-bold ph-hard-drives text-[20px]"></i>
+                </div>
+                <div>
+                  <h3 class="font-bold text-neutral-950 dark:text-white text-xs">MCP Server Subprocess</h3>
+                  <div class="text-[11px] text-neutral-500 font-mono">Python / Node / Go / Rust</div>
+                </div>
+              </div>
+
+              <div class="text-xs text-neutral-600 dark:text-neutral-400 space-y-2 border-t border-neutral-200 dark:border-neutral-800 pt-3">
+                <p>Spawned as a child process via <code class="font-mono bg-white dark:bg-neutral-900 px-1 py-0.5 rounded border border-neutral-200 dark:border-neutral-800">os/exec</code> with signal forwarding.</p>
+                <div class="space-y-1.5 text-[11px] font-mono">
+                  <div class="flex items-center space-x-1.5 text-neutral-500">
+                    <i class="ph ph-check text-emerald-500"></i>
+                    <span>SIGINT / SIGTERM propagation</span>
+                  </div>
+                  <div class="flex items-center space-x-1.5 text-neutral-500">
+                    <i class="ph ph-check text-emerald-500"></i>
+                    <span>Automatic clean exit</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 1-Click Replay Module -->
+            <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3 space-y-1.5 font-mono text-[11px]">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-neutral-950 dark:text-white flex items-center space-x-1">
+                  <i class="ph ph-play text-[14px]"></i>
+                  <span>1-Click Replay</span>
+                </span>
+                <span class="text-[10px] text-emerald-600 dark:text-emerald-400">Isolated Instance</span>
+              </div>
+              <div class="text-[10px] text-neutral-500">Executes payload in isolated subshell without touching live client session.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Data Flow Sequence & Lifecycle -->
+    <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-2xs space-y-4">
+      <h3 class="text-xs font-bold uppercase tracking-wider text-neutral-950 dark:text-white font-mono flex items-center space-x-2">
+        <i class="ph-bold ph-arrows-left-right text-[16px]"></i>
+        <span>End-to-End JSON-RPC Request Lifecycle</span>
+      </h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-3 font-mono text-xs">
+        <div class="bg-neutral-50 dark:bg-neutral-950 p-3 rounded-lg border border-neutral-200 dark:border-neutral-800 space-y-1">
+          <div class="text-[10px] text-neutral-500 font-bold">STEP 1</div>
+          <div class="font-bold text-neutral-950 dark:text-white">Client Tool Call</div>
+          <div class="text-[11px] text-neutral-500">Claude emits <span class="text-neutral-800 dark:text-neutral-200">tools/call</span> over stdin pipe.</div>
+        </div>
+
+        <div class="bg-neutral-50 dark:bg-neutral-950 p-3 rounded-lg border border-neutral-200 dark:border-neutral-800 space-y-1">
+          <div class="text-[10px] text-neutral-500 font-bold">STEP 2</div>
+          <div class="font-bold text-neutral-950 dark:text-white">Forward & Ingest</div>
+          <div class="text-[11px] text-neutral-500">Forwarded immediately to child process; queued to async analyzer.</div>
+        </div>
+
+        <div class="bg-neutral-50 dark:bg-neutral-950 p-3 rounded-lg border border-neutral-200 dark:border-neutral-800 space-y-1">
+          <div class="text-[10px] text-neutral-500 font-bold">STEP 3</div>
+          <div class="font-bold text-neutral-950 dark:text-white">Target Execution</div>
+          <div class="text-[11px] text-neutral-500">Server computes result; proxy records exact latency in microsecond map.</div>
+        </div>
+
+        <div class="bg-neutral-50 dark:bg-neutral-950 p-3 rounded-lg border border-neutral-200 dark:border-neutral-800 space-y-1">
+          <div class="text-[10px] text-neutral-500 font-bold">STEP 4</div>
+          <div class="font-bold text-neutral-950 dark:text-white">Heuristic Evaluation</div>
+          <div class="text-[11px] text-neutral-500">Worker evaluates loop conditions, schema integrity, and latency threshold.</div>
+        </div>
+
+        <div class="bg-neutral-50 dark:bg-neutral-950 p-3 rounded-lg border border-neutral-200 dark:border-neutral-800 space-y-1">
+          <div class="text-[10px] text-neutral-500 font-bold">STEP 5</div>
+          <div class="font-bold text-neutral-950 dark:text-white">Persist & Stream</div>
+          <div class="text-[11px] text-neutral-500">Trace committed to SQLite WAL; SSE pushes live update to browser dashboard.</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="border-t border-neutral-200 dark:border-neutral-800 py-4 text-center text-xs text-neutral-500 font-mono">
+    MCPOp Architecture Specification — MIT License © 2026 Jang Trinh
+  </footer>
+
+  <script>
+    function toggleTheme() {
+      const html = document.documentElement;
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        document.getElementById('themeBtn').innerHTML = '<i class="ph ph-moon text-[16px]"></i>';
+        localStorage.setItem('theme', 'light');
+      } else {
+        html.classList.remove('light');
+        html.classList.add('dark');
+        document.getElementById('themeBtn').innerHTML = '<i class="ph ph-sun text-[16px]"></i>';
+        localStorage.setItem('theme', 'dark');
+      }
+    }
+
+    if (localStorage.getItem('theme') === 'dark') {
+      document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
+    }
+  </script>
+</body>
+</html>
