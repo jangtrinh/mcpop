@@ -5,13 +5,13 @@ import (
 	"net/http"
 )
 
-// Embedded modern Light Theme Dashboard with Be Vietnam Pro font & Phosphor Icons
+// Embedded premium Neutral B&W Monochrome Dashboard
 const DashboardHTML = `<!DOCTYPE html>
 <html lang="en" class="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MCPOp — MCP Observability & Silent Failure Catcher</title>
+  <title>MCPOp — MCP Observability & Failure Catcher</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <!-- Phosphor Icons -->
@@ -22,12 +22,18 @@ const DashboardHTML = `<!DOCTYPE html>
       theme: {
         extend: {
           colors: {
-            brand: {
-              50: '#f5f3ff',
-              100: '#ede9fe',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
+            neutral: {
+              50: '#fafafa',
+              100: '#f4f4f5',
+              200: '#e4e4e7',
+              300: '#d4d4d8',
+              400: '#a1a1aa',
+              500: '#71717a',
+              600: '#52525b',
+              700: '#3f3f46',
+              800: '#27272a',
+              900: '#18181b',
+              950: '#09090b',
             }
           }
         }
@@ -38,57 +44,57 @@ const DashboardHTML = `<!DOCTYPE html>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Be Vietnam Pro', sans-serif; font-size: 13px; }
+    body { font-family: 'Be Vietnam Pro', sans-serif; font-size: 13px; letter-spacing: -0.01em; }
     code, pre, .font-mono { font-family: 'JetBrains Mono', monospace; }
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
-    .dark ::-webkit-scrollbar-thumb { background: #334155; }
+    ::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 9999px; }
+    .dark ::-webkit-scrollbar-thumb { background: #3f3f46; }
   </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased transition-colors duration-200 selection:bg-indigo-500 selection:text-white">
+<body class="bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 min-h-screen flex flex-col antialiased transition-colors duration-150 selection:bg-neutral-900 selection:text-white dark:selection:bg-white dark:selection:text-black">
 
-  <!-- Top Navigation Bar -->
-  <header class="border-b border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur sticky top-0 z-30 px-6 py-3.5 flex items-center justify-between shadow-xs">
+  <!-- Top Navigation Bar (High-end Neutral B&W) -->
+  <header class="border-b border-neutral-200/90 dark:border-neutral-800/90 bg-white/95 dark:bg-neutral-900/95 backdrop-blur sticky top-0 z-30 px-6 py-3.5 flex items-center justify-between shadow-2xs">
     <div class="flex items-center space-x-3.5">
-      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-md shadow-indigo-500/20 text-white font-bold" aria-hidden="true">
-        <i class="ph ph-lightning text-[18px]"></i>
+      <div class="w-8 h-8 rounded-lg bg-neutral-950 dark:bg-white text-white dark:text-neutral-950 flex items-center justify-center font-bold shadow-xs" aria-hidden="true">
+        <i class="ph-bold ph-terminal text-[16px]"></i>
       </div>
       <div>
         <div class="flex items-center space-x-2">
-          <span class="font-extrabold tracking-tight text-slate-900 dark:text-white text-base">MCPOp</span>
-          <span class="text-[11px] font-semibold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/60 px-2 py-0.5 rounded-full">Observability</span>
-          <span class="text-[11px] font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">v0.1.0</span>
+          <span class="font-extrabold tracking-tight text-neutral-950 dark:text-white text-base">MCPOp</span>
+          <span class="text-[11px] font-semibold bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700 px-2 py-0.5 rounded-md uppercase tracking-wider">Observability</span>
+          <span class="text-[11px] font-mono font-medium text-neutral-500 bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded">v0.1.0</span>
         </div>
-        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Silent Failure Catcher & Realtime Waterfall for MCP</p>
+        <p class="text-xs text-neutral-500 dark:text-neutral-400 font-medium">Silent Failure Catcher & Realtime Waterfall for MCP</p>
       </div>
     </div>
 
-    <!-- Active Session, SSE Pulse & Theme Toggle -->
+    <!-- Active Session, Live Indicator & Theme Toggle -->
     <div class="flex items-center space-x-3">
-      <!-- Live SSE Connection Pill -->
-      <div class="flex items-center space-x-2 text-xs bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 px-3 py-1.5 rounded-lg text-emerald-700 dark:text-emerald-400 shadow-2xs font-medium">
+      <!-- Live Indicator -->
+      <div class="flex items-center space-x-2 text-xs bg-neutral-100 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700 px-3 py-1.5 rounded-lg text-neutral-800 dark:text-neutral-200 font-medium">
         <span class="relative flex h-2 w-2" aria-hidden="true">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-neutral-900 dark:bg-white opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-neutral-900 dark:bg-white"></span>
         </span>
         <span id="liveStatus">Live SSE Connected</span>
       </div>
 
       <!-- Session Picker -->
-      <div class="flex items-center space-x-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-1 shadow-2xs">
+      <div class="flex items-center space-x-1 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg p-1 shadow-2xs">
         <label for="sessionSelect" class="sr-only">Select Session</label>
-        <i class="ph ph-terminal-window text-[16px] text-slate-400 pl-2" aria-hidden="true"></i>
-        <select id="sessionSelect" aria-label="Target MCP Session" class="bg-transparent text-xs text-slate-700 dark:text-slate-200 font-medium py-1.5 px-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 rounded cursor-pointer min-h-[32px]">
+        <i class="ph ph-terminal-window text-[16px] text-neutral-400 pl-2" aria-hidden="true"></i>
+        <select id="sessionSelect" aria-label="Target MCP Session" class="bg-transparent text-xs text-neutral-800 dark:text-neutral-200 font-medium py-1.5 px-2 focus:outline-none focus:ring-1 focus:ring-neutral-950 dark:focus:ring-white rounded cursor-pointer min-h-[32px]">
           <option value="">Loading sessions...</option>
         </select>
-        <button onclick="refreshData()" aria-label="Refresh Data" title="Refresh" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 rounded text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+        <button onclick="refreshData()" aria-label="Refresh Data" title="Refresh" class="w-8 h-8 flex items-center justify-center hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded text-neutral-500 hover:text-neutral-900 dark:hover:text-white transition focus:outline-none focus:ring-1 focus:ring-neutral-950 dark:focus:ring-white">
           <i class="ph ph-arrows-clockwise text-[16px]"></i>
         </button>
       </div>
 
       <!-- Theme Switcher -->
-      <button onclick="toggleTheme()" id="themeBtn" aria-label="Toggle Dark/Light Theme" class="w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-center transition shadow-2xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+      <button onclick="toggleTheme()" id="themeBtn" aria-label="Toggle Dark/Light Theme" class="w-8 h-8 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700 flex items-center justify-center transition shadow-2xs focus:outline-none focus:ring-1 focus:ring-neutral-950 dark:focus:ring-white">
         <i class="ph ph-moon text-[16px]"></i>
       </button>
     </div>
@@ -97,148 +103,148 @@ const DashboardHTML = `<!DOCTYPE html>
   <!-- Main Container -->
   <main class="flex-1 max-w-7xl w-full mx-auto p-6 space-y-6">
 
-    <!-- Interactive Architecture Flow Diagram -->
-    <div class="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 shadow-xs">
+    <!-- Interactive Architecture Flow Diagram (Neutral B&W) -->
+    <div class="bg-white dark:bg-neutral-900 border border-neutral-200/90 dark:border-neutral-800/90 rounded-xl p-5 shadow-2xs">
       <div class="flex items-center justify-between mb-4">
-        <div class="flex items-center space-x-2 text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-          <i class="ph ph-network text-[18px] text-indigo-600" aria-hidden="true"></i>
+        <div class="flex items-center space-x-2 text-xs font-bold text-neutral-900 dark:text-white uppercase tracking-wider">
+          <i class="ph-bold ph-network text-[18px]" aria-hidden="true"></i>
           <span>Transparent Interceptor Topology</span>
         </div>
-        <span class="text-[11px] text-slate-500 dark:text-slate-400 font-mono" id="diagCommand">Command: (waiting for session)</span>
+        <span class="text-[11px] text-neutral-500 font-mono" id="diagCommand">Command: (waiting for session)</span>
       </div>
 
       <!-- Visual Flow Chart Diagram -->
       <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-center text-center">
         <!-- Node 1: AI Client -->
-        <div class="bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 shadow-2xs">
-          <div class="w-8 h-8 mx-auto rounded-lg bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-1.5" aria-hidden="true">
+        <div class="bg-neutral-50 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700 rounded-lg p-3.5">
+          <div class="w-8 h-8 mx-auto rounded-md bg-neutral-200 dark:bg-neutral-700 text-neutral-900 dark:text-white flex items-center justify-center mb-1.5" aria-hidden="true">
             <i class="ph ph-robot text-[18px]"></i>
           </div>
-          <div class="text-xs font-bold text-slate-800 dark:text-slate-200">AI Client</div>
-          <div class="text-[11px] text-slate-500">Claude / Cursor / Agent</div>
+          <div class="text-xs font-bold text-neutral-900 dark:text-white">AI Client</div>
+          <div class="text-[11px] text-neutral-500">Claude / Cursor / Agent</div>
         </div>
 
         <!-- Connection Arrow 1 -->
-        <div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 py-1" aria-hidden="true">
-          <span class="text-[11px] font-mono font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/80 px-2.5 py-0.5 rounded-full border border-indigo-200/60 dark:border-indigo-800 mb-1">stdio pipe</span>
+        <div class="flex flex-col items-center justify-center text-neutral-400 py-1" aria-hidden="true">
+          <span class="text-[11px] font-mono font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-800 px-2.5 py-0.5 rounded border border-neutral-200 dark:border-neutral-700 mb-1">stdio pipe</span>
           <i class="ph ph-arrows-left-right text-[16px] hidden md:block"></i>
           <i class="ph ph-arrows-down-up text-[16px] md:hidden"></i>
         </div>
 
-        <!-- Node 2: MCPOp Engine (Hero Focus) -->
-        <div class="bg-gradient-to-b from-indigo-50/80 to-white dark:from-slate-800 dark:to-slate-900 border-2 border-indigo-500/80 rounded-xl p-3.5 shadow-sm shadow-indigo-500/10 relative">
-          <div class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-[11px] font-extrabold uppercase px-2.5 py-0.5 rounded-full tracking-wider shadow-xs">
+        <!-- Node 2: MCPOp Engine (Hero Neutral Focus) -->
+        <div class="bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-950 border border-neutral-950 dark:border-white rounded-lg p-3.5 relative shadow-xs">
+          <div class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-neutral-950 dark:bg-white text-white dark:text-neutral-950 text-[11px] font-mono font-bold uppercase px-2.5 py-0.5 rounded border border-neutral-700 dark:border-neutral-300 tracking-wider">
             Active Proxy
           </div>
-          <div class="w-8 h-8 mx-auto rounded-lg bg-indigo-600 text-white flex items-center justify-center mb-1.5 shadow-xs" aria-hidden="true">
+          <div class="w-8 h-8 mx-auto rounded-md bg-neutral-800 dark:bg-neutral-200 flex items-center justify-center mb-1.5" aria-hidden="true">
             <i class="ph ph-shield-check text-[18px]"></i>
           </div>
-          <div class="text-xs font-bold text-indigo-950 dark:text-white">MCPOp Core</div>
-          <div class="text-[11px] text-indigo-600 dark:text-indigo-400 font-mono font-medium">&lt;1ms Overhead Interceptor</div>
+          <div class="text-xs font-bold">MCPOp Core</div>
+          <div class="text-[11px] opacity-80 font-mono font-medium">&lt;1ms Interceptor</div>
         </div>
 
         <!-- Connection Arrow 2 -->
-        <div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 py-1" aria-hidden="true">
-          <span class="text-[11px] font-mono font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/80 px-2.5 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800 mb-1">JSON-RPC 2.0</span>
+        <div class="flex flex-col items-center justify-center text-neutral-400 py-1" aria-hidden="true">
+          <span class="text-[11px] font-mono font-medium text-neutral-700 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-800 px-2.5 py-0.5 rounded border border-neutral-200 dark:border-neutral-700 mb-1">JSON-RPC 2.0</span>
           <i class="ph ph-arrows-left-right text-[16px] hidden md:block"></i>
           <i class="ph ph-arrows-down-up text-[16px] md:hidden"></i>
         </div>
 
         <!-- Node 3: Target Server -->
-        <div class="bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 shadow-2xs">
-          <div class="w-8 h-8 mx-auto rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-1.5" aria-hidden="true">
+        <div class="bg-neutral-50 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700 rounded-lg p-3.5">
+          <div class="w-8 h-8 mx-auto rounded-md bg-neutral-200 dark:bg-neutral-700 text-neutral-900 dark:text-white flex items-center justify-center mb-1.5" aria-hidden="true">
             <i class="ph ph-hard-drives text-[18px]"></i>
           </div>
-          <div class="text-xs font-bold text-slate-800 dark:text-slate-200">Target MCP Server</div>
-          <div class="text-[11px] text-slate-500">Python / Node / Go Tools</div>
+          <div class="text-xs font-bold text-neutral-900 dark:text-white">Target Server</div>
+          <div class="text-[11px] text-neutral-500">Python / Node / Go Tools</div>
         </div>
       </div>
     </div>
 
-    <!-- Stats KPI Cards -->
+    <!-- Stats KPI Cards (Clean B&W Monochrome) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition">
-        <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold">
+      <div class="bg-white dark:bg-neutral-900 border border-neutral-200/90 dark:border-neutral-800/90 rounded-xl p-4 shadow-2xs hover:border-neutral-400 dark:hover:border-neutral-600 transition">
+        <div class="flex items-center justify-between text-neutral-500 text-xs font-semibold">
           <span>Total Tool Invocations</span>
-          <div class="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center" aria-hidden="true">
+          <div class="w-7 h-7 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 flex items-center justify-center" aria-hidden="true">
             <i class="ph ph-stack text-[16px]"></i>
           </div>
         </div>
-        <div class="text-2xl font-black text-slate-900 dark:text-white mt-2" id="statTotalCalls">0</div>
-        <div class="text-[11px] text-slate-500 mt-1 flex items-center space-x-1.5 font-medium">
-          <i class="ph ph-chart-bar text-[16px] text-indigo-500" aria-hidden="true"></i>
+        <div class="text-2xl font-extrabold text-neutral-950 dark:text-white mt-2" id="statTotalCalls">0</div>
+        <div class="text-[11px] text-neutral-500 mt-1 flex items-center space-x-1.5 font-medium">
+          <i class="ph ph-chart-bar text-[16px]" aria-hidden="true"></i>
           <span>Captured in real-time</span>
         </div>
       </div>
 
-      <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition">
-        <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold">
+      <div class="bg-white dark:bg-neutral-900 border border-neutral-200/90 dark:border-neutral-800/90 rounded-xl p-4 shadow-2xs hover:border-neutral-400 dark:hover:border-neutral-600 transition">
+        <div class="flex items-center justify-between text-neutral-500 text-xs font-semibold">
           <span>Success Reliability</span>
-          <div class="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center" aria-hidden="true">
+          <div class="w-7 h-7 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 flex items-center justify-center" aria-hidden="true">
             <i class="ph ph-check-circle text-[16px]"></i>
           </div>
         </div>
-        <div class="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-2" id="statSuccessRate">100%</div>
-        <div class="text-[11px] text-slate-500 mt-1 flex items-center space-x-1.5 font-medium" id="statErrorCallsBox">
+        <div class="text-2xl font-extrabold text-neutral-950 dark:text-white mt-2" id="statSuccessRate">100%</div>
+        <div class="text-[11px] text-neutral-500 mt-1 flex items-center space-x-1.5 font-medium" id="statErrorCallsBox">
           <span id="statErrorCalls">0 errors</span>
         </div>
       </div>
 
-      <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition">
-        <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold">
+      <div class="bg-white dark:bg-neutral-900 border border-neutral-200/90 dark:border-neutral-800/90 rounded-xl p-4 shadow-2xs hover:border-neutral-400 dark:hover:border-neutral-600 transition">
+        <div class="flex items-center justify-between text-neutral-500 text-xs font-semibold">
           <span>Average Latency</span>
-          <div class="w-7 h-7 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center" aria-hidden="true">
+          <div class="w-7 h-7 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 flex items-center justify-center" aria-hidden="true">
             <i class="ph ph-timer text-[16px]"></i>
           </div>
         </div>
-        <div class="text-2xl font-black text-slate-900 dark:text-white mt-2" id="statAvgLatency">0 ms</div>
-        <div class="text-[11px] text-slate-500 mt-1 flex items-center space-x-1 font-medium">
+        <div class="text-2xl font-extrabold text-neutral-950 dark:text-white mt-2" id="statAvgLatency">0 ms</div>
+        <div class="text-[11px] text-neutral-500 mt-1 flex items-center space-x-1 font-medium">
           <span>Execution time per call</span>
         </div>
       </div>
 
-      <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition">
-        <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold">
+      <div class="bg-white dark:bg-neutral-900 border border-neutral-200/90 dark:border-neutral-800/90 rounded-xl p-4 shadow-2xs hover:border-neutral-400 dark:hover:border-neutral-600 transition">
+        <div class="flex items-center justify-between text-neutral-500 text-xs font-semibold">
           <span>Silent Failures Intercepted</span>
-          <div class="w-7 h-7 rounded-lg bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center" aria-hidden="true">
+          <div class="w-7 h-7 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 flex items-center justify-center" aria-hidden="true">
             <i class="ph ph-warning text-[16px]"></i>
           </div>
         </div>
-        <div class="text-2xl font-black text-rose-600 dark:text-rose-400 mt-2" id="statFailures">0</div>
-        <div class="text-[11px] text-slate-500 mt-1 flex items-center space-x-1 font-medium">
+        <div class="text-2xl font-extrabold text-neutral-950 dark:text-white mt-2" id="statFailures">0</div>
+        <div class="text-[11px] text-neutral-500 mt-1 flex items-center space-x-1 font-medium">
           <span>Loops, Schemas & Slow Tools</span>
         </div>
       </div>
     </div>
 
-    <!-- Charts & Anomaly Section -->
+    <!-- Charts Section (Monochrome Analytics) -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       
-      <!-- Chart 1: Latency Waterfall Trend (2 cols) -->
-      <div class="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-xs">
+      <!-- Chart 1: Latency Timeline (2 cols) -->
+      <div class="lg:col-span-2 bg-white dark:bg-neutral-900 border border-neutral-200/90 dark:border-neutral-800/90 rounded-xl p-5 shadow-2xs">
         <div class="flex items-center justify-between mb-4">
           <div>
-            <h3 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center space-x-2">
-              <i class="ph ph-chart-line-up text-[18px] text-indigo-600" aria-hidden="true"></i>
+            <h3 class="text-xs font-bold text-neutral-900 dark:text-white uppercase tracking-wider flex items-center space-x-2">
+              <i class="ph-bold ph-chart-line-up text-[18px]" aria-hidden="true"></i>
               <span>Tool Call Latency Timeline (ms)</span>
             </h3>
-            <p class="text-[11px] text-slate-500 font-medium">Execution latency distribution with threshold detection</p>
+            <p class="text-[11px] text-neutral-500 font-medium">Execution latency progression across sequence</p>
           </div>
-          <span class="text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded">Realtime</span>
+          <span class="text-[11px] font-mono bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 px-2 py-0.5 rounded font-semibold">Realtime</span>
         </div>
         <div class="relative h-48 w-full">
           <canvas id="latencyChart" role="img" aria-label="Tool Latency Timeline Chart"></canvas>
         </div>
       </div>
 
-      <!-- Chart 2: Tool Distribution & Status (1 col) -->
-      <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-xs flex flex-col justify-between">
+      <!-- Chart 2: Tool Shares Doughnut (1 col) -->
+      <div class="bg-white dark:bg-neutral-900 border border-neutral-200/90 dark:border-neutral-800/90 rounded-xl p-5 shadow-2xs flex flex-col justify-between">
         <div>
-          <h3 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center space-x-2 mb-1">
-            <i class="ph ph-chart-pie-slice text-[18px] text-violet-600" aria-hidden="true"></i>
+          <h3 class="text-xs font-bold text-neutral-900 dark:text-white uppercase tracking-wider flex items-center space-x-2 mb-1">
+            <i class="ph-bold ph-chart-pie-slice text-[18px]" aria-hidden="true"></i>
             <span>Tool Invocation Shares</span>
           </h3>
-          <p class="text-[11px] text-slate-500 font-medium mb-3">Volume distribution across tool types</p>
+          <p class="text-[11px] text-neutral-500 font-medium mb-3">Volume breakdown by tool name</p>
         </div>
         <div class="relative h-44 flex items-center justify-center">
           <canvas id="toolPieChart" role="img" aria-label="Tool Invocation Share Doughnut Chart"></canvas>
@@ -248,54 +254,54 @@ const DashboardHTML = `<!DOCTYPE html>
 
     <!-- Failure Alerts Section -->
     <div id="failureAlertsContainer" class="hidden space-y-2.5" role="region" aria-label="Failure Alerts">
-      <div class="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">
-        <i class="ph ph-radiation text-[18px] text-rose-500" aria-hidden="true"></i>
-        <span>Heuristic Anomaly Detections (Immediate Action Required)</span>
+      <div class="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-neutral-950 dark:text-white">
+        <i class="ph-bold ph-warning-circle text-[18px]" aria-hidden="true"></i>
+        <span>Heuristic Anomaly Detections</span>
       </div>
       <div id="failureAlertsList" class="space-y-2"></div>
     </div>
 
     <!-- Traces Waterfall Table -->
-    <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs">
-      <div class="p-4 border-b border-slate-200/80 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
+    <div class="bg-white dark:bg-neutral-900 border border-neutral-200/90 dark:border-neutral-800/90 rounded-xl overflow-hidden shadow-2xs">
+      <div class="p-4 border-b border-neutral-200/90 dark:border-neutral-800/90 flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center space-x-3">
-          <h2 class="text-sm font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+          <h2 class="text-sm font-bold text-neutral-950 dark:text-white flex items-center space-x-2">
             <span>Live Tool Trace Waterfall</span>
           </h2>
-          <span id="traceCountBadge" class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2.5 py-0.5 rounded-full font-mono font-semibold">0 traces</span>
+          <span id="traceCountBadge" class="text-[11px] bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 px-2.5 py-0.5 rounded font-mono font-semibold">0 traces</span>
         </div>
 
         <div class="flex items-center space-x-2.5">
           <!-- Filter Buttons -->
-          <div class="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300" role="group" aria-label="Filter traces">
-            <button onclick="setFilter('all')" id="filterAll" class="px-3 py-1.5 rounded-md bg-white dark:bg-slate-700 shadow-2xs text-slate-900 dark:text-white font-semibold transition focus:outline-none focus:ring-2 focus:ring-indigo-500/20">All</button>
-            <button onclick="setFilter('errors')" id="filterErrors" class="px-3 py-1.5 rounded-md hover:text-slate-900 dark:hover:text-white transition focus:outline-none focus:ring-2 focus:ring-indigo-500/20">Errors</button>
-            <button onclick="setFilter('slow')" id="filterSlow" class="px-3 py-1.5 rounded-md hover:text-slate-900 dark:hover:text-white transition focus:outline-none focus:ring-2 focus:ring-indigo-500/20">Slow</button>
+          <div class="flex items-center bg-neutral-100 dark:bg-neutral-800 p-0.5 rounded-lg text-xs font-medium text-neutral-600 dark:text-neutral-400" role="group" aria-label="Filter traces">
+            <button onclick="setFilter('all')" id="filterAll" class="px-3 py-1.5 rounded-md bg-white dark:bg-neutral-700 shadow-2xs text-neutral-950 dark:text-white font-bold transition focus:outline-none focus:ring-1 focus:ring-neutral-950 dark:focus:ring-white">All</button>
+            <button onclick="setFilter('errors')" id="filterErrors" class="px-3 py-1.5 rounded-md hover:text-neutral-950 dark:hover:text-white transition focus:outline-none focus:ring-1 focus:ring-neutral-950 dark:focus:ring-white">Errors</button>
+            <button onclick="setFilter('slow')" id="filterSlow" class="px-3 py-1.5 rounded-md hover:text-neutral-950 dark:hover:text-white transition focus:outline-none focus:ring-1 focus:ring-neutral-950 dark:focus:ring-white">Slow</button>
           </div>
 
           <div class="relative">
             <label for="searchTraces" class="sr-only">Search tool traces</label>
-            <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[16px]" aria-hidden="true"></i>
-            <input id="searchTraces" oninput="renderTraces()" type="text" placeholder="Search tools..." aria-label="Search tools by name" class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-xs rounded-lg pl-8 pr-3 py-1.5 text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 w-44 min-h-[32px]">
+            <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 text-[16px]" aria-hidden="true"></i>
+            <input id="searchTraces" oninput="renderTraces()" type="text" placeholder="Search tools..." aria-label="Search tools by name" class="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-700 text-xs rounded-lg pl-8 pr-3 py-1.5 text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-950 dark:focus:ring-white focus:border-neutral-950 w-44 min-h-[32px]">
           </div>
         </div>
       </div>
 
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs" role="table">
-          <thead class="bg-slate-50/70 dark:bg-slate-950/60 text-slate-500 dark:text-slate-400 border-b border-slate-200/80 dark:border-slate-800 font-semibold">
+          <thead class="bg-neutral-50 dark:bg-neutral-950/80 text-neutral-600 dark:text-neutral-400 border-b border-neutral-200/90 dark:border-neutral-800/90 font-semibold">
             <tr>
               <th scope="col" class="py-3 px-4">Status</th>
               <th scope="col" class="py-3 px-4">Tool Name</th>
               <th scope="col" class="py-3 px-4">Arguments Payload</th>
-              <th scope="col" class="py-3 px-4">Latency (Waterfall)</th>
+              <th scope="col" class="py-3 px-4">Latency</th>
               <th scope="col" class="py-3 px-4">Timestamp</th>
               <th scope="col" class="py-3 px-4 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody id="traceTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 font-mono">
+          <tbody id="traceTableBody" class="divide-y divide-neutral-200/60 dark:divide-neutral-800/60 font-mono">
             <tr>
-              <td colspan="6" class="py-12 text-center text-slate-400 font-sans">No tool calls recorded in this session yet.</td>
+              <td colspan="6" class="py-12 text-center text-neutral-400 font-sans">No tool calls recorded in this session yet.</td>
             </tr>
           </tbody>
         </table>
@@ -304,18 +310,18 @@ const DashboardHTML = `<!DOCTYPE html>
 
   </main>
 
-  <!-- Tool Detail & Replay Drawer Modal -->
-  <div id="detailModal" onclick="handleBackdropClick(event)" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="modalToolName">
-    <div id="modalCard" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-3xl w-full shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+  <!-- Tool Detail & Replay Drawer Modal (Neutral B&W) -->
+  <div id="detailModal" onclick="handleBackdropClick(event)" class="fixed inset-0 bg-neutral-950/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="modalToolName">
+    <div id="modalCard" class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl max-w-3xl w-full shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
       
       <!-- Modal Header -->
-      <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900">
+      <div class="px-6 py-4 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between bg-neutral-50/50 dark:bg-neutral-900">
         <div class="flex items-center space-x-2.5">
-          <div class="w-3 h-3 rounded-full bg-indigo-600" aria-hidden="true"></div>
-          <h3 class="font-bold text-slate-900 dark:text-white text-base font-mono" id="modalToolName">tool/name</h3>
-          <span id="modalStatusBadge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase"></span>
+          <div class="w-2.5 h-2.5 rounded-full bg-neutral-950 dark:bg-white" aria-hidden="true"></div>
+          <h3 class="font-bold text-neutral-950 dark:text-white text-base font-mono" id="modalToolName">tool/name</h3>
+          <span id="modalStatusBadge" class="text-[11px] font-bold px-2.5 py-0.5 rounded uppercase"></span>
         </div>
-        <button onclick="closeModal()" aria-label="Close dialog" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+        <button onclick="closeModal()" aria-label="Close dialog" class="w-8 h-8 rounded-lg flex items-center justify-center text-neutral-400 hover:text-neutral-950 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition focus:outline-none focus:ring-1 focus:ring-neutral-950 dark:focus:ring-white">
           <i class="ph ph-x text-[18px]"></i>
         </button>
       </div>
@@ -324,36 +330,36 @@ const DashboardHTML = `<!DOCTYPE html>
       <div class="p-6 overflow-y-auto space-y-5 text-xs">
         <div>
           <div class="flex items-center justify-between mb-1.5">
-            <label for="modalArgsInput" class="block text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider text-[11px]">Input Arguments (Editable JSON)</label>
-            <button onclick="copyArgsJSON()" id="btnCopyArgs" class="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline flex items-center space-x-1 font-sans font-semibold">
+            <label for="modalArgsInput" class="block text-neutral-700 dark:text-neutral-300 font-bold uppercase tracking-wider text-[11px]">Input Arguments (JSON)</label>
+            <button onclick="copyArgsJSON()" id="btnCopyArgs" class="text-[11px] text-neutral-900 dark:text-neutral-100 hover:underline flex items-center space-x-1 font-sans font-semibold">
               <i class="ph ph-copy text-[16px]"></i>
               <span id="copyArgsText">Copy JSON</span>
             </button>
           </div>
-          <textarea id="modalArgsInput" aria-label="Input arguments in JSON" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 font-mono text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 h-32"></textarea>
+          <textarea id="modalArgsInput" aria-label="Input arguments in JSON" class="w-full bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3 font-mono text-neutral-900 dark:text-neutral-100 text-xs focus:outline-none focus:ring-1 focus:ring-neutral-950 dark:focus:ring-white h-32"></textarea>
         </div>
 
         <div>
-          <label class="block text-slate-600 dark:text-slate-400 font-bold mb-1.5 uppercase tracking-wider text-[11px]">Execution Result Payload</label>
-          <pre id="modalResultText" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 font-mono text-emerald-600 dark:text-emerald-400 text-xs overflow-x-auto max-h-48 whitespace-pre-wrap"></pre>
+          <label class="block text-neutral-700 dark:text-neutral-300 font-bold mb-1.5 uppercase tracking-wider text-[11px]">Execution Result Payload</label>
+          <pre id="modalResultText" class="w-full bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3 font-mono text-neutral-800 dark:text-neutral-200 text-xs overflow-x-auto max-h-48 whitespace-pre-wrap"></pre>
         </div>
 
         <!-- Replay Result Box -->
-        <div id="replayResultBox" class="hidden p-4 rounded-xl border border-indigo-200 dark:border-indigo-800/80 bg-indigo-50/60 dark:bg-indigo-950/30 space-y-2">
+        <div id="replayResultBox" class="hidden p-4 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-100/70 dark:bg-neutral-800/40 space-y-2">
           <div class="flex items-center justify-between">
-            <span class="font-bold text-indigo-900 dark:text-indigo-300 text-xs">Replay Execution Response</span>
-            <span id="replayLatencyBadge" class="text-[11px] font-mono font-bold text-indigo-700 dark:text-indigo-400"></span>
+            <span class="font-bold text-neutral-950 dark:text-white text-xs">Replay Execution Response</span>
+            <span id="replayLatencyBadge" class="text-[11px] font-mono font-bold text-neutral-700 dark:text-neutral-300"></span>
           </div>
-          <pre id="replayOutputText" class="font-mono text-xs text-slate-800 dark:text-slate-200 whitespace-pre-wrap bg-white dark:bg-slate-950 p-3 rounded-lg border border-indigo-100 dark:border-slate-800"></pre>
+          <pre id="replayOutputText" class="font-mono text-xs text-neutral-900 dark:text-neutral-100 whitespace-pre-wrap bg-white dark:bg-neutral-950 p-3 rounded border border-neutral-200 dark:border-neutral-700"></pre>
         </div>
       </div>
 
       <!-- Modal Footer -->
-      <div class="px-6 py-3.5 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 flex items-center justify-between">
-        <div class="text-[11px] text-slate-500 font-mono" id="modalMetadata">Latency: 0ms</div>
+      <div class="px-6 py-3.5 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 flex items-center justify-between">
+        <div class="text-[11px] text-neutral-500 font-mono" id="modalMetadata">Latency: 0ms</div>
         <div class="flex items-center space-x-2">
-          <button onclick="closeModal()" class="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition shadow-2xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20">Close</button>
-          <button id="btnReplay" onclick="runReplay()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center space-x-2 shadow-md shadow-indigo-500/20 focus:outline-none focus:ring-2 focus:ring-indigo-500/30">
+          <button onclick="closeModal()" class="px-4 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 text-xs font-semibold transition shadow-2xs focus:outline-none focus:ring-1 focus:ring-neutral-950 dark:focus:ring-white">Close</button>
+          <button id="btnReplay" onclick="runReplay()" class="px-4 py-2 rounded-lg bg-neutral-950 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-neutral-950 text-xs font-bold transition flex items-center space-x-2 shadow-xs focus:outline-none focus:ring-1 focus:ring-neutral-950 dark:focus:ring-white">
             <i class="ph ph-play text-[16px]"></i>
             <span>1-Click Replay</span>
           </button>
@@ -389,7 +395,6 @@ const DashboardHTML = `<!DOCTYPE html>
       updateChartsTheme();
     }
 
-    // Set initial theme
     if (localStorage.getItem('theme') === 'dark') {
       document.documentElement.classList.add('dark');
       document.documentElement.classList.remove('light');
@@ -399,7 +404,6 @@ const DashboardHTML = `<!DOCTYPE html>
       await fetchSessions();
       setupSSE();
 
-      // Close modal on Escape key (A11y Floor)
       window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
           closeModal();
@@ -489,24 +493,18 @@ const DashboardHTML = `<!DOCTYPE html>
 
       failures.forEach(f => {
         const div = document.createElement('div');
-        let badgeColor = 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-800/80';
         let icon = 'ph-repeat';
-        if (f.failure_type === 'schema_mismatch') {
-          badgeColor = 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800/80';
-          icon = 'ph-code';
-        } else if (f.failure_type === 'slow_tool') {
-          badgeColor = 'bg-orange-50 dark:bg-orange-950/40 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800/80';
-          icon = 'ph-hourglass';
-        }
+        if (f.failure_type === 'schema_mismatch') icon = 'ph-code';
+        else if (f.failure_type === 'slow_tool') icon = 'ph-hourglass';
 
-        div.className = 'p-3.5 rounded-xl border flex items-start space-x-3.5 shadow-2xs ' + badgeColor;
-        div.innerHTML = '<i class="ph ' + icon + ' mt-0.5 text-[18px]"></i>' +
+        div.className = 'p-3.5 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-100/90 dark:bg-neutral-800/80 text-neutral-900 dark:text-neutral-100 flex items-start space-x-3.5 shadow-2xs';
+        div.innerHTML = '<i class="ph-bold ' + icon + ' mt-0.5 text-[18px]"></i>' +
           '<div class="flex-1">' +
             '<div class="flex items-center justify-between">' +
               '<span class="font-bold text-xs uppercase tracking-wider">' + f.failure_type.replace('_', ' ') + '</span>' +
-              '<span class="text-[11px] font-mono opacity-80">' + new Date(f.created_at).toLocaleTimeString() + '</span>' +
+              '<span class="text-[11px] font-mono opacity-60">' + new Date(f.created_at).toLocaleTimeString() + '</span>' +
             '</div>' +
-            '<p class="text-xs mt-1 font-medium">' + f.description + '</p>' +
+            '<p class="text-xs mt-1 font-medium text-neutral-700 dark:text-neutral-300">' + f.description + '</p>' +
           '</div>';
         list.appendChild(div);
       });
@@ -517,9 +515,9 @@ const DashboardHTML = `<!DOCTYPE html>
       ['All', 'Errors', 'Slow'].forEach(name => {
         const btn = document.getElementById('filter' + name);
         if (name.toLowerCase() === f) {
-          btn.className = 'px-3 py-1.5 rounded-md bg-white dark:bg-slate-700 shadow-2xs text-slate-900 dark:text-white font-semibold transition focus:outline-none focus:ring-2 focus:ring-indigo-500/20';
+          btn.className = 'px-3 py-1.5 rounded-md bg-white dark:bg-neutral-700 shadow-2xs text-neutral-950 dark:text-white font-bold transition focus:outline-none focus:ring-1 focus:ring-neutral-950 dark:focus:ring-white';
         } else {
-          btn.className = 'px-3 py-1.5 rounded-md hover:text-slate-900 dark:hover:text-white transition focus:outline-none focus:ring-2 focus:ring-indigo-500/20 font-medium';
+          btn.className = 'px-3 py-1.5 rounded-md hover:text-neutral-950 dark:hover:text-white transition focus:outline-none focus:ring-1 focus:ring-neutral-950 dark:focus:ring-white font-medium';
         }
       });
       renderTraces();
@@ -538,32 +536,20 @@ const DashboardHTML = `<!DOCTYPE html>
       }
 
       if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="py-12 text-center text-slate-400 font-sans">No matching tool calls found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="py-12 text-center text-neutral-400 font-sans">No matching tool calls found.</td></tr>';
         return;
       }
 
       tbody.innerHTML = '';
       filtered.forEach(t => {
         const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition cursor-pointer';
+        tr.className = 'hover:bg-neutral-100/60 dark:hover:bg-neutral-800/40 transition cursor-pointer';
 
-        let statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">SUCCESS</span>';
+        let statusBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-neutral-200 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 border border-neutral-300 dark:border-neutral-700">OK</span>';
         if (t.is_error || t.status === 'failed') {
-          statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800">FAILED</span>';
+          statusBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-neutral-950 text-white dark:bg-white dark:text-black">FAIL</span>';
         } else if (t.status === 'pending') {
-          statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 animate-pulse">RUNNING</span>';
-        }
-
-        let latColor = 'text-emerald-600 dark:text-emerald-400';
-        let barWidth = Math.min(100, Math.max(8, (t.latency_ms / 3000) * 100));
-        let barColor = 'bg-emerald-500';
-        if (t.latency_ms > 1000) {
-          latColor = 'text-amber-600 dark:text-amber-400';
-          barColor = 'bg-amber-500';
-        }
-        if (t.latency_ms >= 5000) {
-          latColor = 'text-rose-600 dark:text-rose-400 font-bold';
-          barColor = 'bg-rose-500';
+          statusBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border border-neutral-300 dark:border-neutral-700 animate-pulse">RUN</span>';
         }
 
         let argsPreview = t.arguments;
@@ -573,19 +559,12 @@ const DashboardHTML = `<!DOCTYPE html>
 
         tr.innerHTML = 
           '<td class="py-3 px-4">' + statusBadge + '</td>' +
-          '<td class="py-3 px-4 font-bold text-slate-800 dark:text-slate-200">' + t.tool_name + '</td>' +
-          '<td class="py-3 px-4 text-slate-500 dark:text-slate-400 truncate max-w-xs">' + argsPreview + '</td>' +
-          '<td class="py-3 px-4">' +
-            '<div class="flex items-center space-x-2">' +
-              '<span class="' + latColor + ' font-bold">' + t.latency_ms + ' ms</span>' +
-              '<div class="w-16 bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden" aria-hidden="true">' +
-                '<div class="' + barColor + ' h-full rounded-full" style="width: ' + barWidth + '%"></div>' +
-              '</div>' +
-            '</div>' +
-          '</td>' +
-          '<td class="py-3 px-4 text-slate-400 text-[11px]">' + new Date(t.created_at).toLocaleTimeString() + '</td>' +
+          '<td class="py-3 px-4 font-bold text-neutral-950 dark:text-white">' + t.tool_name + '</td>' +
+          '<td class="py-3 px-4 text-neutral-500 truncate max-w-xs">' + argsPreview + '</td>' +
+          '<td class="py-3 px-4 font-bold font-mono text-neutral-900 dark:text-neutral-100">' + t.latency_ms + ' ms</td>' +
+          '<td class="py-3 px-4 text-neutral-400 text-[11px]">' + new Date(t.created_at).toLocaleTimeString() + '</td>' +
           '<td class="py-3 px-4 text-right space-x-2 font-sans">' +
-            '<button onclick="inspectTrace(\'' + t.id + '\')" aria-label="Inspect tool call ' + t.tool_name + '" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-indigo-500/20">Inspect</button>' +
+            '<button onclick="inspectTrace(\'' + t.id + '\')" aria-label="Inspect tool call ' + t.tool_name + '" class="px-3 py-1.5 rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-900 dark:text-neutral-100 text-xs font-semibold transition focus:outline-none focus:ring-1 focus:ring-neutral-950 dark:focus:ring-white">Inspect</button>' +
           '</td>';
 
         tr.onclick = (e) => {
@@ -599,10 +578,11 @@ const DashboardHTML = `<!DOCTYPE html>
 
     function renderCharts() {
       const isDark = document.documentElement.classList.contains('dark');
-      const gridColor = isDark ? 'rgba(51, 65, 85, 0.4)' : 'rgba(226, 232, 240, 0.8)';
-      const textColor = isDark ? '#94a3b8' : '#64748b';
+      const gridColor = isDark ? 'rgba(63, 63, 70, 0.4)' : 'rgba(228, 228, 231, 0.8)';
+      const textColor = isDark ? '#a1a1aa' : '#71717a';
+      const lineColor = isDark ? '#ffffff' : '#18181b';
 
-      // 1. Latency Line Chart
+      // 1. Latency Line Chart (Monochrome)
       const orderedTraces = [...traces].reverse();
       const labels = orderedTraces.map((t, i) => '#' + (i + 1) + ' ' + t.tool_name);
       const latencies = orderedTraces.map(t => t.latency_ms);
@@ -617,13 +597,13 @@ const DashboardHTML = `<!DOCTYPE html>
           datasets: [{
             label: 'Latency (ms)',
             data: latencies,
-            borderColor: '#6366f1',
-            backgroundColor: 'rgba(99, 102, 241, 0.08)',
-            borderWidth: 2.5,
+            borderColor: lineColor,
+            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(24, 24, 27, 0.04)',
+            borderWidth: 2,
             fill: true,
-            tension: 0.35,
-            pointRadius: 4,
-            pointBackgroundColor: '#6366f1'
+            tension: 0.25,
+            pointRadius: 3,
+            pointBackgroundColor: lineColor
           }]
         },
         options: {
@@ -646,7 +626,7 @@ const DashboardHTML = `<!DOCTYPE html>
         }
       });
 
-      // 2. Tool Distribution Pie Chart
+      // 2. Tool Distribution Pie Chart (Monochrome Shades)
       const toolCounts = {};
       traces.forEach(t => {
         toolCounts[t.tool_name] = (toolCounts[t.tool_name] || 0) + 1;
@@ -664,9 +644,11 @@ const DashboardHTML = `<!DOCTYPE html>
           labels: pieLabels,
           datasets: [{
             data: pieData,
-            backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'],
-            borderWidth: 2,
-            borderColor: isDark ? '#0f172a' : '#ffffff'
+            backgroundColor: isDark 
+              ? ['#ffffff', '#d4d4d8', '#a1a1aa', '#71717a', '#3f3f46']
+              : ['#18181b', '#3f3f46', '#71717a', '#a1a1aa', '#e4e4e7'],
+            borderWidth: 1.5,
+            borderColor: isDark ? '#09090b' : '#ffffff'
           }]
         },
         options: {
@@ -678,7 +660,7 @@ const DashboardHTML = `<!DOCTYPE html>
               labels: { color: textColor, boxWidth: 10, font: { family: 'Be Vietnam Pro', size: 11 } }
             }
           },
-          cutout: '65%'
+          cutout: '70%'
         }
       });
     }
@@ -698,10 +680,10 @@ const DashboardHTML = `<!DOCTYPE html>
       const statusBadge = document.getElementById('modalStatusBadge');
       if (trace.is_error) {
         statusBadge.textContent = 'Failed';
-        statusBadge.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase bg-rose-100 text-rose-700 border border-rose-200';
+        statusBadge.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded uppercase bg-neutral-950 text-white dark:bg-white dark:text-black';
       } else {
         statusBadge.textContent = 'Success';
-        statusBadge.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase bg-emerald-100 text-emerald-700 border border-emerald-200';
+        statusBadge.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded uppercase bg-neutral-200 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100 border border-neutral-300 dark:border-neutral-700';
       }
 
       try {
