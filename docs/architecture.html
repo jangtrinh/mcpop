@@ -1,393 +1,294 @@
-<!DOCTYPE html>
-<html lang="en" class="light">
+<!doctype html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MCPOp — Architecture Diagram</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            neutral: {
-              50: '#fafafa',
-              100: '#f4f4f5',
-              200: '#e4e4e7',
-              300: '#d4d4d8',
-              400: '#a1a1aa',
-              500: '#71717a',
-              600: '#52525b',
-              700: '#3f3f46',
-              800: '#27272a',
-              900: '#18181b',
-              950: '#09090b',
-            }
-          }
-        }
-      }
-    }
-  </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    body { font-family: 'Be Vietnam Pro', -apple-system, sans-serif; font-size: 13px; letter-spacing: -0.01em; }
-    code, pre, .font-mono { font-family: 'JetBrains Mono', monospace; }
-    ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 9999px; }
-    .dark ::-webkit-scrollbar-thumb { background: #3f3f46; }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MCPOp System Architecture</title>
+<style>
+  /*
+   * Design:OS Diagram Architecture Contract
+   * Fully self-contained, project token inheritance, zero script, accessible inline SVG.
+   */
+  :root {
+    --diagram-paper:       #fafafa;
+    --diagram-surface:     #ffffff;
+    --diagram-ink:         #18181b;
+    --diagram-muted:       #71717a;
+    --diagram-soft:        #a1a1aa;
+    --diagram-rule:        #e4e4e7;
+    --diagram-rule-solid:  #d4d4d8;
+    --diagram-accent:      #18181b;
+    --diagram-accent-tint: #f4f4f5;
+    --diagram-link:        #09090b;
+    --diagram-success:     #15803d;
+    --diagram-success-tint:#f0fdf4;
+    --diagram-danger:      #be123c;
+    --diagram-danger-tint: #fff1f2;
+    --diagram-warning:     #b45309;
+    --diagram-warning-tint:#fffbeb;
 
-    @keyframes pulse-flow {
-      0% { stroke-dashoffset: 24; }
-      100% { stroke-dashoffset: 0; }
+    --diagram-hairline: 1px;
+    --diagram-gap: 24px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --diagram-paper:       #09090b;
+      --diagram-surface:     #18181b;
+      --diagram-ink:         #f4f4f5;
+      --diagram-muted:       #a1a1aa;
+      --diagram-soft:        #71717a;
+      --diagram-rule:        #27272a;
+      --diagram-rule-solid:  #3f3f46;
+      --diagram-accent:      #ffffff;
+      --diagram-accent-tint: #27272a;
+      --diagram-link:        #fafafa;
+      --diagram-success:     #4ade80;
+      --diagram-success-tint:#052e16;
+      --diagram-danger:      #fb7185;
+      --diagram-danger-tint: #4c0519;
+      --diagram-warning:     #fbbf24;
+      --diagram-warning-tint:#451a03;
     }
-    .flow-line {
-      stroke-dasharray: 6 6;
-      animation: pulse-flow 1.2s linear infinite;
-    }
-    .flow-line-reverse {
-      stroke-dasharray: 6 6;
-      animation: pulse-flow 1.2s linear infinite reverse;
-    }
-  </style>
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--diagram-paper);
+    color: var(--diagram-ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: 48px 32px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .frame { max-width: 1140px; width: 100%; }
+
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--diagram-muted);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: var(--diagram-muted);
+    margin-bottom: var(--diagram-gap);
+  }
+
+  .canvas {
+    background: var(--diagram-surface);
+    border: var(--diagram-hairline) solid var(--diagram-rule);
+    border-radius: 12px;
+    padding: 24px;
+    overflow-x: auto;
+  }
+
+  svg { width: 100%; min-width: 980px; height: auto; display: block; }
+
+  /* Node styling */
+  .node-shape { fill: var(--diagram-surface); stroke: var(--diagram-rule-solid); stroke-width: var(--diagram-hairline); rx: 6px; }
+  .node-shape--focal { fill: var(--diagram-accent-tint); stroke: var(--diagram-accent); stroke-width: 2px; }
+  .node-shape--danger { fill: var(--diagram-danger-tint); stroke: var(--diagram-danger); }
+  .node-shape--warning { fill: var(--diagram-warning-tint); stroke: var(--diagram-warning); }
+  .node-shape--success { fill: var(--diagram-success-tint); stroke: var(--diagram-success); }
+
+  .node-label { fill: var(--diagram-ink); font-size: 12px; font-weight: 600; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+  .node-sublabel { fill: var(--diagram-muted); font-size: 11px; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+  .node-tag { fill: var(--diagram-muted); font-size: 10px; font-family: ui-monospace, monospace; text-transform: uppercase; }
+
+  /* Zone styling */
+  .zone { fill: var(--diagram-paper); stroke: var(--diagram-rule); stroke-width: var(--diagram-hairline); stroke-dasharray: 4 4; rx: 8px; }
+  .zone-label { fill: var(--diagram-muted); font-size: 11px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; }
+
+  /* Edge & connector styling */
+  .edge { fill: none; stroke: var(--diagram-rule-solid); stroke-width: 1.5; }
+  .edge--fast { stroke: var(--diagram-success); stroke-width: 2; }
+  .edge--async { stroke: var(--diagram-muted); stroke-width: 1.5; stroke-dasharray: 4 4; }
+  .edge--danger { stroke: var(--diagram-danger); stroke-width: 1.5; }
+  .edge--warning { stroke: var(--diagram-warning); stroke-width: 1.5; }
+
+  .edge-label { fill: var(--diagram-muted); font-size: 11px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+  .edge-label--fast { fill: var(--diagram-success); font-weight: 600; }
+</style>
 </head>
-<body class="bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 min-h-screen flex flex-col antialiased selection:bg-neutral-900 selection:text-white dark:selection:bg-white dark:selection:text-black">
+<body>
+  <div class="frame">
+    <p class="eyebrow">Design:OS Architecture Spec</p>
+    <h1>MCPOp Transparent Proxy &amp; Failure Engine</h1>
+    <p class="subtitle">Zero-overhead stdio interceptor, heuristic failure detector, and local observability dashboard.</p>
 
-  <!-- Lean Header -->
-  <header class="border-b border-neutral-200 dark:border-neutral-800 bg-white/90 dark:bg-neutral-900/90 backdrop-blur sticky top-0 z-30 px-6 py-3 flex items-center justify-between shadow-2xs">
-    <div class="flex items-center space-x-3">
-      <div class="w-8 h-8 rounded-lg bg-neutral-950 dark:bg-white text-white dark:text-neutral-950 flex items-center justify-center font-bold shadow-xs">
-        <i class="ph-bold ph-terminal text-[16px]"></i>
-      </div>
-      <div>
-        <div class="flex items-center space-x-2">
-          <span class="font-extrabold tracking-tight text-neutral-950 dark:text-white text-base">MCPOp</span>
-          <span class="text-[11px] font-semibold bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700 px-2 py-0.5 rounded">Architecture Spec</span>
-          <span class="text-[11px] font-mono text-neutral-500 bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded">v0.1.0</span>
-        </div>
-        <p class="text-xs text-neutral-500 font-medium">Zero-Overhead Transparent Stdio Proxy & Heuristic Observability Engine</p>
-      </div>
+    <div class="canvas">
+      <svg viewBox="0 0 1040 490" xmlns="http://www.w3.org/2000/svg"
+           role="img"
+           aria-labelledby="diagram-title diagram-desc"
+           data-diagram-owned="true"
+           data-diagram-grammar="architecture"
+           data-reading-order="left-to-right"
+           data-focal-id="node-mcpop-core"
+           data-source-kind="brief">
+        <title id="diagram-title">MCPOp System Architecture and Request Pipeline</title>
+        <desc id="diagram-desc">An AI client communicates via stdio pipes through the MCPOp transparent proxy to a target MCP server. MCPOp asynchronously evaluates tool calls against loop, schema, and latency heuristics while streaming telemetry to an embedded SQLite store and web dashboard.</desc>
+
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <path d="M 0 0 L 8 3 L 0 6 z" fill="currentColor"/>
+          </marker>
+        </defs>
+
+        <!-- ZONE 1: AI Client -->
+        <g data-diagram-element="zone" id="zone-client">
+          <rect class="zone" x="30" y="40" width="220" height="410"/>
+          <text class="zone-label" x="46" y="66">AI Client Layer</text>
+        </g>
+
+        <!-- ZONE 2: MCPOp Single Binary Core -->
+        <g data-diagram-element="zone" id="zone-mcpop">
+          <rect class="zone" x="270" y="40" width="480" height="410"/>
+          <text class="zone-label" x="286" y="66">MCPOp Core (Go Binary)</text>
+        </g>
+
+        <!-- ZONE 3: Target Server -->
+        <g data-diagram-element="zone" id="zone-target">
+          <rect class="zone" x="770" y="40" width="230" height="410"/>
+          <text class="zone-label" x="786" y="66">MCP Server Process</text>
+        </g>
+
+        <!-- NODE: AI Client -->
+        <g data-diagram-element="node" id="node-ai-client">
+          <rect class="node-shape" x="50" y="200" width="180" height="84"/>
+          <text class="node-tag" x="66" y="222">Caller</text>
+          <text class="node-label" x="66" y="244">Claude / Cursor</text>
+          <text class="node-sublabel" x="66" y="264">Agent Runtime (stdio)</text>
+        </g>
+
+        <!-- NODE: Transparent Stdio Interceptor (Center Fast Path) -->
+        <g data-diagram-element="node" id="node-proxy-interceptor">
+          <rect class="node-shape" x="400" y="200" width="220" height="84"/>
+          <text class="node-tag" x="416" y="222">Fast Path &lt;0.5ms</text>
+          <text class="node-label" x="416" y="244">Stdio Interceptor</text>
+          <text class="node-sublabel" x="416" y="264">Non-blocking I/O Pump</text>
+        </g>
+
+        <!-- NODE: Focal Core Heuristic Engine (Upper Tier) -->
+        <g data-diagram-element="node" id="node-mcpop-core">
+          <rect class="node-shape node-shape--focal" x="400" y="80" width="220" height="74"/>
+          <text class="node-tag" x="416" y="102">Focal Component</text>
+          <text class="node-label" x="416" y="122">Heuristics Engine</text>
+          <text class="node-sublabel" x="416" y="140">Async Worker Goroutine</text>
+        </g>
+
+        <!-- NODE: Schema & Lag Validator (Upper Left) -->
+        <g data-diagram-element="node" id="node-schema-validator">
+          <rect class="node-shape node-shape--warning" x="290" y="80" width="94" height="74"/>
+          <text class="node-label" x="302" y="104">Schema</text>
+          <text class="node-label" x="302" y="120">&amp; Lag</text>
+          <text class="node-tag" x="302" y="140">Audit</text>
+        </g>
+
+        <!-- NODE: Loop Detector (Upper Right) -->
+        <g data-diagram-element="node" id="node-loop-detector">
+          <rect class="node-shape node-shape--danger" x="636" y="80" width="94" height="74"/>
+          <text class="node-label" x="648" y="104">Loop</text>
+          <text class="node-label" x="648" y="120">Detector</text>
+          <text class="node-tag" x="648" y="140">Fail &gt;=2</text>
+        </g>
+
+        <!-- NODE: SQLite Storage (Lower Left) -->
+        <g data-diagram-element="node" id="node-sqlite">
+          <rect class="node-shape" x="290" y="345" width="200" height="66"/>
+          <text class="node-tag" x="306" y="365">Pure Go</text>
+          <text class="node-label" x="306" y="383">SQLite Storage</text>
+          <text class="node-sublabel" x="306" y="399">~/.mcpop/data.db (WAL)</text>
+        </g>
+
+        <!-- NODE: Dashboard & SSE Hub (Lower Right) -->
+        <g data-diagram-element="node" id="node-dashboard-hub">
+          <rect class="node-shape" x="530" y="345" width="200" height="66"/>
+          <text class="node-tag" x="546" y="365">HTTP :4040</text>
+          <text class="node-label" x="546" y="383">Dashboard &amp; SSE</text>
+          <text class="node-sublabel" x="546" y="399">Real-time trace stream</text>
+        </g>
+
+        <!-- NODE: Target MCP Subprocess -->
+        <g data-diagram-element="node" id="node-target-server">
+          <rect class="node-shape" x="790" y="200" width="190" height="84"/>
+          <text class="node-tag" x="806" y="222">Child Process</text>
+          <text class="node-label" x="806" y="244">Target MCP Server</text>
+          <text class="node-sublabel" x="806" y="264">Python / Node / Go Tools</text>
+        </g>
+
+        <!-- NODE: 1-Click Replay -->
+        <g data-diagram-element="node" id="node-replay-runner">
+          <rect class="node-shape node-shape--success" x="790" y="345" width="190" height="66"/>
+          <text class="node-tag" x="806" y="365">Debug Mode</text>
+          <text class="node-label" x="806" y="383">1-Click Replay</text>
+          <text class="node-sublabel" x="806" y="399">Isolated subshell re-exec</text>
+        </g>
+
+        <!-- CONNECTORS (Strictly Orthogonal & Independently Traceable) -->
+
+        <!-- Client -> Proxy (Fast Path Request) -->
+        <line class="edge edge--fast" data-diagram-element="edge" id="edge-client-proxy"
+              x1="230" y1="230" x2="400" y2="230" marker-end="url(#arrow)"/>
+        <text class="edge-label edge-label--fast" x="315" y="222" text-anchor="middle">stdin</text>
+
+        <!-- Proxy -> Client (Fast Path Response) -->
+        <line class="edge edge--fast" data-diagram-element="edge" id="edge-proxy-client"
+              x1="400" y1="255" x2="230" y2="255" marker-end="url(#arrow)"/>
+        <text class="edge-label edge-label--fast" x="315" y="269" text-anchor="middle">stdout</text>
+
+        <!-- Proxy -> Target (Direct Pass-Through Request) -->
+        <line class="edge edge--fast" data-diagram-element="edge" id="edge-proxy-target"
+              x1="620" y1="230" x2="790" y2="230" marker-end="url(#arrow)"/>
+        <text class="edge-label edge-label--fast" x="705" y="222" text-anchor="middle">pass-through</text>
+
+        <!-- Target -> Proxy (Direct Pass-Through Response) -->
+        <line class="edge edge--fast" data-diagram-element="edge" id="edge-target-proxy"
+              x1="790" y1="255" x2="620" y2="255" marker-end="url(#arrow)"/>
+        <text class="edge-label edge-label--fast" x="705" y="269" text-anchor="middle">result/error</text>
+
+        <!-- Proxy -> Core (Async Channel Event Queue Upward) -->
+        <line class="edge edge--async" data-diagram-element="edge" id="edge-proxy-core"
+              x1="510" y1="200" x2="510" y2="154" marker-end="url(#arrow)"/>
+        <text class="edge-label" x="518" y="180">chan event</text>
+
+        <!-- Core -> Schema Validator (Left) -->
+        <line class="edge edge--warning" data-diagram-element="edge" id="edge-core-schema"
+              x1="400" y1="117" x2="384" y2="117" marker-end="url(#arrow)"/>
+
+        <!-- Core -> Loop Detector (Right) -->
+        <line class="edge edge--danger" data-diagram-element="edge" id="edge-core-loop"
+              x1="620" y1="117" x2="636" y2="117" marker-end="url(#arrow)"/>
+
+        <!-- Core -> SQLite (Downward Left Path) -->
+        <path class="edge edge--async" data-diagram-element="edge" id="edge-core-sqlite"
+              d="M 440 154 V 315 H 390 V 345" marker-end="url(#arrow)"/>
+        <text class="edge-label" x="350" y="332" text-anchor="middle">write trace</text>
+
+        <!-- Core -> Dashboard (Downward Right Path) -->
+        <path class="edge edge--async" data-diagram-element="edge" id="edge-core-dashboard"
+              d="M 580 154 V 315 H 630 V 345" marker-end="url(#arrow)"/>
+        <text class="edge-label" x="668" y="332" text-anchor="middle">SSE broadcast</text>
+
+        <!-- Dashboard -> Replay Runner -->
+        <line class="edge" data-diagram-element="edge" id="edge-dashboard-replay"
+              x1="730" y1="378" x2="790" y2="378" marker-end="url(#arrow)"/>
+        <text class="edge-label" x="760" y="370" text-anchor="middle">invoke</text>
+      </svg>
     </div>
-
-    <!-- Controls -->
-    <div class="flex items-center space-x-3">
-      <div class="flex items-center space-x-2 text-xs bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 px-2.5 py-1 rounded text-emerald-700 dark:text-emerald-400 font-mono text-[11px] font-medium">
-        <span class="relative flex h-2 w-2">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
-        </span>
-        <span>Overhead &lt;0.5ms</span>
-      </div>
-
-      <button onclick="toggleTheme()" id="themeBtn" aria-label="Toggle Theme" class="w-8 h-8 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 flex items-center justify-center transition shadow-2xs">
-        <i class="ph ph-moon text-[16px]"></i>
-      </button>
-    </div>
-  </header>
-
-  <!-- Main Canvas Container -->
-  <main class="flex-1 max-w-7xl w-full mx-auto p-6 space-y-6">
-
-    <!-- Top Architecture Summary Strip -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 font-mono text-xs">
-      <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-3 shadow-2xs">
-        <div class="text-[11px] text-neutral-500 uppercase tracking-wider font-semibold">1. Interception Layer</div>
-        <div class="font-bold text-neutral-950 dark:text-white mt-1">Non-blocking Stdio Pipes</div>
-        <div class="text-[11px] text-neutral-500 mt-0.5">Microsecond pass-through</div>
-      </div>
-      <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-3 shadow-2xs">
-        <div class="text-[11px] text-neutral-500 uppercase tracking-wider font-semibold">2. Async Event Bus</div>
-        <div class="font-bold text-neutral-950 dark:text-white mt-1">Buffered Queue (2048)</div>
-        <div class="text-[11px] text-neutral-500 mt-0.5">Decoupled parser goroutine</div>
-      </div>
-      <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-3 shadow-2xs">
-        <div class="text-[11px] text-neutral-500 uppercase tracking-wider font-semibold">3. Failure Heuristics</div>
-        <div class="font-bold text-neutral-950 dark:text-white mt-1">Loops, Schemas & Lag</div>
-        <div class="text-[11px] text-neutral-500 mt-0.5">Zero-latency evaluation</div>
-      </div>
-      <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-3 shadow-2xs">
-        <div class="text-[11px] text-neutral-500 uppercase tracking-wider font-semibold">4. Storage & UI</div>
-        <div class="font-bold text-neutral-950 dark:text-white mt-1">Pure Go SQLite + Web</div>
-        <div class="text-[11px] text-neutral-500 mt-0.5">Embedded SPA & SSE Hub</div>
-      </div>
-    </div>
-
-    <!-- Master Architecture Blueprint (Design:OS Visual Topology) -->
-    <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 shadow-xs relative overflow-hidden">
-      
-      <div class="flex items-center justify-between mb-6 border-b border-neutral-200 dark:border-neutral-800 pb-4">
-        <div>
-          <h2 class="text-sm font-bold text-neutral-950 dark:text-white uppercase tracking-wider flex items-center space-x-2">
-            <i class="ph-bold ph-network text-[18px]"></i>
-            <span>System Pipeline & Data Flow Blueprint</span>
-          </h2>
-          <p class="text-xs text-neutral-500 mt-0.5">Detailed interaction map between AI Client, Proxy Interceptor, Goroutines, Storage, and MCP Target.</p>
-        </div>
-        <div class="flex items-center space-x-3 text-[11px] font-mono text-neutral-500">
-          <span class="flex items-center space-x-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span><span>Synchronous Fast Path</span></span>
-          <span class="flex items-center space-x-1.5"><span class="w-2 h-2 rounded-full bg-neutral-400"></span><span>Asynchronous Worker</span></span>
-        </div>
-      </div>
-
-      <!-- 3-Tier Grid Diagram -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch relative">
-        
-        <!-- Tier 1: Client Environment (3 cols) -->
-        <div class="lg:col-span-3 flex flex-col space-y-4">
-          <div class="text-xs font-bold text-neutral-500 uppercase tracking-wider flex items-center space-x-1.5 font-mono">
-            <span>[01]</span>
-            <span>AI Client Layer</span>
-          </div>
-
-          <div class="flex-1 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 flex flex-col justify-between space-y-4">
-            <div class="space-y-3">
-              <div class="flex items-center space-x-3">
-                <div class="w-9 h-9 rounded-lg bg-neutral-200 dark:bg-neutral-800 text-neutral-900 dark:text-white flex items-center justify-center">
-                  <i class="ph-bold ph-robot text-[20px]"></i>
-                </div>
-                <div>
-                  <h3 class="font-bold text-neutral-950 dark:text-white text-xs">AI Client Runtime</h3>
-                  <div class="text-[11px] text-neutral-500 font-mono">Claude Desktop / Cursor</div>
-                </div>
-              </div>
-
-              <div class="text-xs text-neutral-600 dark:text-neutral-400 space-y-2 border-t border-neutral-200 dark:border-neutral-800 pt-3">
-                <p>Initiates tool execution via standard JSON-RPC 2.0 requests over process pipes.</p>
-                <div class="bg-white dark:bg-neutral-900 p-2.5 rounded-lg border border-neutral-200 dark:border-neutral-800 font-mono text-[11px] space-y-1">
-                  <div class="text-neutral-500"># Process Invocation:</div>
-                  <div class="text-neutral-950 dark:text-white font-semibold">mcpop run -- &lt;cmd&gt;</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- IPC Pipe Indicators -->
-            <div class="space-y-2 border-t border-neutral-200 dark:border-neutral-800 pt-3 font-mono text-[11px]">
-              <div class="flex items-center justify-between text-neutral-600 dark:text-neutral-300 bg-white dark:bg-neutral-900 px-2.5 py-1.5 rounded border border-neutral-200 dark:border-neutral-800">
-                <span class="flex items-center space-x-1.5"><i class="ph ph-arrow-right text-[14px]"></i><span>stdin</span></span>
-                <span class="text-neutral-500">Client Requests</span>
-              </div>
-              <div class="flex items-center justify-between text-neutral-600 dark:text-neutral-300 bg-white dark:bg-neutral-900 px-2.5 py-1.5 rounded border border-neutral-200 dark:border-neutral-800">
-                <span class="flex items-center space-x-1.5"><i class="ph ph-arrow-left text-[14px]"></i><span>stdout</span></span>
-                <span class="text-neutral-500">Tool Responses</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Tier 2: MCPOp Core Engine (6 cols - Hero Node) -->
-        <div class="lg:col-span-6 flex flex-col space-y-4">
-          <div class="text-xs font-bold text-neutral-950 dark:text-white uppercase tracking-wider flex items-center space-x-1.5 font-mono">
-            <span>[02]</span>
-            <span>MCPOp Single Binary Core</span>
-          </div>
-
-          <div class="flex-1 bg-gradient-to-b from-white to-neutral-50 dark:from-neutral-900 dark:to-neutral-950 border-2 border-neutral-950 dark:border-white rounded-xl p-5 flex flex-col space-y-4 shadow-sm">
-            
-            <!-- Component A: Transparent Fast-Path Stdio Proxy -->
-            <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3.5 space-y-2 shadow-2xs">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                  <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
-                  <span class="font-bold text-xs text-neutral-950 dark:text-white font-mono">1. Zero-Overhead Stdio Proxy Layer</span>
-                </div>
-                <span class="text-[11px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded">Fast Path &lt;0.5ms</span>
-              </div>
-              <p class="text-xs text-neutral-600 dark:text-neutral-400">
-                Synchronously pumps raw bytes between stdin/stdout/stderr using non-blocking goroutines. Emits parsed frame events into background queue without stalling IPC.
-              </p>
-            </div>
-
-            <!-- Component B: Async Event Queue & Goroutine Dispatcher -->
-            <div class="flex items-center space-x-3 font-mono text-[11px] text-neutral-500 px-2">
-              <span>├── Channel Event Bus:</span>
-              <span class="bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 px-2 py-0.5 rounded font-semibold">chan ProxyEvent (cap: 2048)</span>
-              <span>──► Async Processing</span>
-            </div>
-
-            <!-- Component C: Heuristic Silent Failure Engine -->
-            <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3.5 space-y-2 shadow-2xs">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                  <i class="ph-bold ph-shield-check text-[16px] text-neutral-950 dark:text-white"></i>
-                  <span class="font-bold text-xs text-neutral-950 dark:text-white font-mono">2. Heuristic Failure Engine</span>
-                </div>
-                <span class="text-[11px] font-mono text-neutral-500">Real-Time Evaluation</span>
-              </div>
-
-              <!-- 3 Sub-Heuristic Rules -->
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-2 pt-1">
-                <div class="bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/60 rounded-lg p-2.5 space-y-1">
-                  <div class="font-bold text-rose-800 dark:text-rose-300 text-[11px] flex items-center space-x-1">
-                    <i class="ph ph-repeat text-[14px]"></i>
-                    <span>Loop Detector</span>
-                  </div>
-                  <div class="text-[10px] text-rose-700 dark:text-rose-400">Flags consecutive identical failed calls (&ge;2 times).</div>
-                </div>
-
-                <div class="bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 rounded-lg p-2.5 space-y-1">
-                  <div class="font-bold text-amber-800 dark:text-amber-300 text-[11px] flex items-center space-x-1">
-                    <i class="ph ph-code text-[14px]"></i>
-                    <span>Schema Validator</span>
-                  </div>
-                  <div class="text-[10px] text-amber-700 dark:text-amber-400">Verifies required arguments & types vs tools/list.</div>
-                </div>
-
-                <div class="bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg p-2.5 space-y-1">
-                  <div class="font-bold text-neutral-800 dark:text-neutral-200 text-[11px] flex items-center space-x-1">
-                    <i class="ph ph-hourglass text-[14px]"></i>
-                    <span>Slow Tool Profiler</span>
-                  </div>
-                  <div class="text-[10px] text-neutral-600 dark:text-neutral-400">Catches latency anomalies exceeding 5000ms.</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Component D: Storage & Server Sidecar -->
-            <div class="grid grid-cols-2 gap-3 pt-1">
-              <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3 space-y-1 shadow-2xs">
-                <div class="font-bold text-neutral-950 dark:text-white text-xs flex items-center space-x-1.5">
-                  <i class="ph ph-database text-[15px]"></i>
-                  <span>Pure Go SQLite</span>
-                </div>
-                <div class="text-[11px] text-neutral-500 font-mono">WAL Mode (~/.mcpop/data.db)</div>
-                <div class="text-[10px] text-neutral-400">Single-writer / multi-reader</div>
-              </div>
-
-              <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3 space-y-1 shadow-2xs">
-                <div class="font-bold text-neutral-950 dark:text-white text-xs flex items-center space-x-1.5">
-                  <i class="ph ph-broadcast text-[15px]"></i>
-                  <span>Live SSE Hub & REST</span>
-                </div>
-                <div class="text-[11px] text-neutral-500 font-mono">http://localhost:4040</div>
-                <div class="text-[10px] text-neutral-400">Instant event broadcast</div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- Tier 3: Target Server & Dashboard (3 cols) -->
-        <div class="lg:col-span-3 flex flex-col space-y-4">
-          <div class="text-xs font-bold text-neutral-500 uppercase tracking-wider flex items-center space-x-1.5 font-mono">
-            <span>[03]</span>
-            <span>Target MCP Server</span>
-          </div>
-
-          <div class="flex-1 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 flex flex-col justify-between space-y-4">
-            <div class="space-y-3">
-              <div class="flex items-center space-x-3">
-                <div class="w-9 h-9 rounded-lg bg-neutral-200 dark:bg-neutral-800 text-neutral-900 dark:text-white flex items-center justify-center">
-                  <i class="ph-bold ph-hard-drives text-[20px]"></i>
-                </div>
-                <div>
-                  <h3 class="font-bold text-neutral-950 dark:text-white text-xs">MCP Server Subprocess</h3>
-                  <div class="text-[11px] text-neutral-500 font-mono">Python / Node / Go / Rust</div>
-                </div>
-              </div>
-
-              <div class="text-xs text-neutral-600 dark:text-neutral-400 space-y-2 border-t border-neutral-200 dark:border-neutral-800 pt-3">
-                <p>Spawned as a child process via <code class="font-mono bg-white dark:bg-neutral-900 px-1 py-0.5 rounded border border-neutral-200 dark:border-neutral-800">os/exec</code> with signal forwarding.</p>
-                <div class="space-y-1.5 text-[11px] font-mono">
-                  <div class="flex items-center space-x-1.5 text-neutral-500">
-                    <i class="ph ph-check text-emerald-500"></i>
-                    <span>SIGINT / SIGTERM propagation</span>
-                  </div>
-                  <div class="flex items-center space-x-1.5 text-neutral-500">
-                    <i class="ph ph-check text-emerald-500"></i>
-                    <span>Automatic clean exit</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- 1-Click Replay Module -->
-            <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3 space-y-1.5 font-mono text-[11px]">
-              <div class="flex items-center justify-between">
-                <span class="font-bold text-neutral-950 dark:text-white flex items-center space-x-1">
-                  <i class="ph ph-play text-[14px]"></i>
-                  <span>1-Click Replay</span>
-                </span>
-                <span class="text-[10px] text-emerald-600 dark:text-emerald-400">Isolated Instance</span>
-              </div>
-              <div class="text-[10px] text-neutral-500">Executes payload in isolated subshell without touching live client session.</div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-
-    <!-- Data Flow Sequence & Lifecycle -->
-    <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-2xs space-y-4">
-      <h3 class="text-xs font-bold uppercase tracking-wider text-neutral-950 dark:text-white font-mono flex items-center space-x-2">
-        <i class="ph-bold ph-arrows-left-right text-[16px]"></i>
-        <span>End-to-End JSON-RPC Request Lifecycle</span>
-      </h3>
-
-      <div class="grid grid-cols-1 md:grid-cols-5 gap-3 font-mono text-xs">
-        <div class="bg-neutral-50 dark:bg-neutral-950 p-3 rounded-lg border border-neutral-200 dark:border-neutral-800 space-y-1">
-          <div class="text-[10px] text-neutral-500 font-bold">STEP 1</div>
-          <div class="font-bold text-neutral-950 dark:text-white">Client Tool Call</div>
-          <div class="text-[11px] text-neutral-500">Claude emits <span class="text-neutral-800 dark:text-neutral-200">tools/call</span> over stdin pipe.</div>
-        </div>
-
-        <div class="bg-neutral-50 dark:bg-neutral-950 p-3 rounded-lg border border-neutral-200 dark:border-neutral-800 space-y-1">
-          <div class="text-[10px] text-neutral-500 font-bold">STEP 2</div>
-          <div class="font-bold text-neutral-950 dark:text-white">Forward & Ingest</div>
-          <div class="text-[11px] text-neutral-500">Forwarded immediately to child process; queued to async analyzer.</div>
-        </div>
-
-        <div class="bg-neutral-50 dark:bg-neutral-950 p-3 rounded-lg border border-neutral-200 dark:border-neutral-800 space-y-1">
-          <div class="text-[10px] text-neutral-500 font-bold">STEP 3</div>
-          <div class="font-bold text-neutral-950 dark:text-white">Target Execution</div>
-          <div class="text-[11px] text-neutral-500">Server computes result; proxy records exact latency in microsecond map.</div>
-        </div>
-
-        <div class="bg-neutral-50 dark:bg-neutral-950 p-3 rounded-lg border border-neutral-200 dark:border-neutral-800 space-y-1">
-          <div class="text-[10px] text-neutral-500 font-bold">STEP 4</div>
-          <div class="font-bold text-neutral-950 dark:text-white">Heuristic Evaluation</div>
-          <div class="text-[11px] text-neutral-500">Worker evaluates loop conditions, schema integrity, and latency threshold.</div>
-        </div>
-
-        <div class="bg-neutral-50 dark:bg-neutral-950 p-3 rounded-lg border border-neutral-200 dark:border-neutral-800 space-y-1">
-          <div class="text-[10px] text-neutral-500 font-bold">STEP 5</div>
-          <div class="font-bold text-neutral-950 dark:text-white">Persist & Stream</div>
-          <div class="text-[11px] text-neutral-500">Trace committed to SQLite WAL; SSE pushes live update to browser dashboard.</div>
-        </div>
-      </div>
-    </div>
-
-  </main>
-
-  <footer class="border-t border-neutral-200 dark:border-neutral-800 py-4 text-center text-xs text-neutral-500 font-mono">
-    MCPOp Architecture Specification — MIT License © 2026 Jang Trinh
-  </footer>
-
-  <script>
-    function toggleTheme() {
-      const html = document.documentElement;
-      if (html.classList.contains('dark')) {
-        html.classList.remove('dark');
-        html.classList.add('light');
-        document.getElementById('themeBtn').innerHTML = '<i class="ph ph-moon text-[16px]"></i>';
-        localStorage.setItem('theme', 'light');
-      } else {
-        html.classList.remove('light');
-        html.classList.add('dark');
-        document.getElementById('themeBtn').innerHTML = '<i class="ph ph-sun text-[16px]"></i>';
-        localStorage.setItem('theme', 'dark');
-      }
-    }
-
-    if (localStorage.getItem('theme') === 'dark') {
-      document.documentElement.classList.add('dark');
-      document.documentElement.classList.remove('light');
-    }
-  </script>
+  </div>
 </body>
 </html>
