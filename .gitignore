@@ -1,0 +1,16 @@
+# Binaries
+bin/
+dist/
+mcpop
+
+# SQLite databases
+*.db
+*.db-shm
+*.db-wal
+
+# OS / Editor files
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.tmp
