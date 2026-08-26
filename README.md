@@ -1,38 +1,41 @@
-# ⚡️ MCPOp — Open-Source Observability & Silent Failure Catcher for MCP Tools
+# MCPOp
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Go-1.23%2B-00ADD8?style=flat&logo=go" alt="Go Version">
-  <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License">
-  <img src="https://img.shields.io/badge/Zero--CGO-Pure%20Go%20SQLite-blue.svg" alt="Zero CGO">
-  <img src="https://img.shields.io/badge/Latency-%3C0.5ms-brightgreen.svg" alt="Latency">
-</p>
-
-> **MCPOp** is a lightweight, zero-overhead **Transparent Stdio/SSE Proxy & Local Observability Dashboard** for AI Agents and Model Context Protocol (MCP) servers (Claude Desktop, Cursor, Antigravity).
-
----
-
-## 📸 Dashboard Showcase
+Transparent observability proxy and silent failure catcher for Model Context Protocol (MCP) servers.
 
 ![MCPOp Live Observability Dashboard](docs/assets/dashboard.png)
 
-*Real-time trace waterfall, p50/p90/p99 telemetry analytics, heuristic silent failure alerts (looping, schema mismatches, slow tools), and 1-click isolated tool replay.*
+---
+
+## Why this exists
+
+If you use Claude Desktop, Cursor, or autonomous agents with MCP servers, you have likely run into this:
+
+You install a bunch of MCP tools, start a coding session, and suddenly your token budget evaporates while the agent produces garbage output.
+
+Here is what is actually happening under the hood:
+
+1. **The Retry Death Loop:** When an MCP tool fails silently (expired token, database timeout, internal 500), the agent does not just stop. It aggressively retries the exact same broken payload 5 to 10 times in a row. Because every retry re-transmits the entire conversation context window, you burn 50,000+ tokens in 30 seconds for zero result.
+2. **Schema Mismatches:** The agent hallucinates arguments or drops a required property. The tool crashes, but because everything runs over background stdio pipes, you see zero logs.
+3. **Latency Black Holes:** A sluggish tool (>5s) stalls the agent workflow until the client times out.
+4. **Painful Debug Loops:** Testing a single broken tool call used to require restarting Claude Desktop or writing manual stdin test harnesses.
+
+MCPOp sits invisibly between your AI client and your MCP server to catch these failures in real time before they burn your wallet.
 
 ---
 
-## 🚨 The Problem: AI Agents Burning Tokens in Silence
+## What MCPOp does
 
-When building or running **MCP Servers** with AI clients like Claude Desktop, Cursor, or autonomous agents:
+MCPOp is a single, zero-dependency Go binary with under 0.5ms proxy overhead.
 
-1. **The Death Loop:** When an AI agent calls a broken tool, it often retries blindly with the same failed payload 5–10 times ➡️ **Thousands of tokens burned in seconds.**
-2. **Schema Mismatch & Hallucinations:** Agents hallucinate invalid arguments or miss required properties, causing cryptic internal crashes.
-3. **Latency Spikes:** Sluggish tools (>5s) cause unexpected agent timeouts and broken multi-turn workflows.
-4. **Painful Debugging:** Testing a single failed tool call requires restarting Claude Desktop or writing manual stdin test scripts.
+- **Loop Detection:** Flags consecutive failed tool calls with identical arguments before they spiral into token-burning loops.
+- **Real-Time Schema Validation:** Cross-checks argument payloads against the server's `tools/list` schema to immediately pinpoint missing required parameters.
+- **Latency Tracking:** Measures execution time per call and flags slow operations exceeding threshold.
+- **1-Click Replay:** Includes an embedded, minimalist B&W web dashboard with live trace waterfalls. Inspect any past payload, edit JSON arguments inline, and re-execute directly in isolation from your browser without restarting your AI client.
+- **Zero Runtime Dependencies:** Packaged as a single standalone binary with embedded SQLite and Web UI. No Node.js, Python, or CGO compiler required.
 
 ---
 
-## 💡 The Solution: MCPOp
-
-**MCPOp** acts as a transparent micro-observability layer standing between your AI Client and any MCP Server (Python, Node.js, Go, Rust):
+## Architecture
 
 ```
 ┌────────────────────────────────────────────────────────┐
@@ -40,16 +43,16 @@ When building or running **MCP Servers** with AI clients like Claude Desktop, Cu
 └──────────────────────────┬─────────────────────────────┘
                            │ Stdio / SSE JSON-RPC
 ┌──────────────────────────▼─────────────────────────────┐
-│ MCPOp Engine (Single Standalone Go Binary)             │
-│ ├── 1. Transparent Stdio Interceptor (<0.5ms overhead)│
-│ ├── 2. Heuristic Failure Engine (Goroutine Worker)     │
-│ │    ├── Loop Detector (Consecutive failure alerts)    │
-│ │    ├── Schema Mismatch / Hallucination Validator     │
-│ │    └── Latency / Slow Tool Tracker                   │
-│ ├── 3. Pure Go SQLite (modernc.org/sqlite - Zero CGO)  │
-│ └── 4. Embedded Web Dashboard (http://localhost:4040)  │
+│ MCPOp Core (<0.5ms Proxy Overhead)                     │
+│ ├── Transparent Stdio Pipe Interceptor                 │
+│ ├── Async Heuristic Failure Worker                     │
+│ │    ├── Retry Loop Catcher (consecutive failures)     │
+│ │    ├── Schema Mismatch & Property Validator          │
+│ │    └── Latency & Slow Tool Profiler                  │
+│ ├── Pure Go SQLite Persistence (~/.mcpop/data.db)      │
+│ └── Embedded Web Dashboard (http://localhost:4040)     │
 └──────────────────────────┬─────────────────────────────┘
-                           │ Child Process Stdio
+                           │ Child Subprocess Stdio
 ┌──────────────────────────▼─────────────────────────────┐
 │ Target MCP Server (Python, Node.js, Go, Rust, etc.)    │
 └────────────────────────────────────────────────────────┘
@@ -57,29 +60,16 @@ When building or running **MCP Servers** with AI clients like Claude Desktop, Cu
 
 ---
 
-## ✨ Key Features
+## Quick Start
 
-- **🔍 Zero-Config Drop-in (<0.5ms Overhead):** Simply prefix your MCP server command with `mcpop run --`. No code modifications required!
-- **🛡️ Silent Failure Catcher:**
-  - **Looping Alert:** Detects when an agent repeats failed calls ($\ge 2$ consecutive times with identical arguments).
-  - **Schema Mismatch:** Validates arguments against `tools/list` schemas in real-time to catch missing required parameters or type violations.
-  - **Slow Tool Warning:** Flags tools with execution times exceeding the configured threshold (default $>5000$ms).
-- **📊 Realtime Live Waterfall Dashboard (`http://localhost:4040`):** Server-Sent Events (SSE) stream tool calls and anomaly alerts directly to a high-density, neutral B&W dashboard.
-- **⚡ 1-Click Replay:** Inspect any tool call, edit JSON arguments, and re-execute directly in isolation from the browser without affecting client sessions.
-- **📦 Single Standalone Binary:** Pure Go with embedded static assets (`//go:embed`) and pure Go SQLite. Zero external dependencies!
+### 1. Install
 
----
-
-## 🚀 Quick Start
-
-### 1. Installation
-
-#### Using Go Install:
+Using Go:
 ```bash
 go install github.com/jangtrinh/mcpop/cmd/mcpop@latest
 ```
 
-#### Or Build from Source:
+Or build from source:
 ```bash
 git clone https://github.com/jangtrinh/mcpop.git
 cd mcpop
@@ -87,11 +77,9 @@ make build
 # Binary is at ./bin/mcpop
 ```
 
----
+### 2. Configure with Claude Desktop or Cursor
 
-### 2. Usage with Claude Desktop / Cursor
-
-Update your `claude_desktop_config.json` or Cursor MCP settings:
+Prefix your existing MCP server command with `mcpop run --`.
 
 #### Before:
 ```json
@@ -105,7 +93,7 @@ Update your `claude_desktop_config.json` or Cursor MCP settings:
 }
 ```
 
-#### After (Observed with MCPOp):
+#### After:
 ```json
 {
   "mcpServers": {
@@ -117,40 +105,46 @@ Update your `claude_desktop_config.json` or Cursor MCP settings:
 }
 ```
 
-Then open **`http://localhost:4040`** to view the live dashboard!
+Open `http://localhost:4040` to view the live dashboard.
 
 ---
 
-### 3. CLI Commands & Flags
+## CLI Reference
 
 ```bash
-# Run with custom dashboard port:
+# Wrap an MCP server command
+mcpop run -- python server.py
+
+# Custom dashboard port
 mcpop run --port 8080 -- python server.py
 
-# Set custom slow tool latency threshold (in ms):
+# Custom slow tool threshold (in ms, default: 5000)
 mcpop run --slow-threshold 2000 -- node index.js
 
-# Run in headless mode (no web UI, background SQLite logging only):
+# Headless mode (no web server, SQLite background logging only)
 mcpop run --no-ui -- python server.py
 
-# Open standalone web dashboard to view past traces and failures:
+# Open standalone dashboard to view past traces and failures
 mcpop dashboard --port 4040
+
+# Print version
+mcpop version
 ```
 
 ---
 
-## 🧪 Testing & Mocking
+## Development and Testing
 
 ```bash
-# Run full unit & race tests:
+# Run unit and race detection tests
 make test
 
-# Run realistic mock traffic generator:
+# Generate realistic mock traffic (20+ tool calls with anomalies)
 python3 test/seed_data.py
 ```
 
 ---
 
-## 📄 License
+## License
 
-MIT License © 2026 Jang Trinh
+MIT License. Free and open source.
