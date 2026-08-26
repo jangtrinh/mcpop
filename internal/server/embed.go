@@ -43,22 +43,9 @@ const DashboardHTML = `<!DOCTYPE html>
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
     .dark ::-webkit-scrollbar-thumb { background: #334155; }
-    
-    /* Background subtle grid pattern */
-    .bg-grid-pattern {
-      background-size: 32px 32px;
-      background-image: 
-        linear-gradient(to right, rgba(226, 232, 240, 0.6) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(226, 232, 240, 0.6) 1px, transparent 1px);
-    }
-    .dark .bg-grid-pattern {
-      background-image: 
-        linear-gradient(to right, rgba(30, 41, 59, 0.5) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(30, 41, 59, 0.5) 1px, transparent 1px);
-    }
   </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased transition-colors duration-200 bg-grid-pattern selection:bg-indigo-500 selection:text-white">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased transition-colors duration-200 selection:bg-indigo-500 selection:text-white">
 
   <!-- Top Navigation Bar -->
   <header class="border-b border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur sticky top-0 z-30 px-6 py-3.5 flex items-center justify-between shadow-xs">
