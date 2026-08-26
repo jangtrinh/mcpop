@@ -5,17 +5,19 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
 
-	"mcpop/internal/storage"
+	"github.com/jangtrinh/mcpop/internal/storage"
 )
 
 type Server struct {
 	repo       *storage.Repository
 	hub        *SSEHub
 	port       int
+	bind       string
 	httpServer *http.Server
 }
 
@@ -30,6 +32,7 @@ func NewServer(repo *storage.Repository, hub *SSEHub, port int) *Server {
 		repo: repo,
 		hub:  hub,
 		port: port,
+		bind: "127.0.0.1",
 	}
 }
 
@@ -37,24 +40,39 @@ func (s *Server) GetHub() *SSEHub {
 	return s.hub
 }
 
-func (s *Server) Start() error {
+func (s *Server) Port() int {
+	return s.port
+}
+
+func (s *Server) Bind() string {
+	if strings.TrimSpace(s.bind) == "" {
+		return "127.0.0.1"
+	}
+	return s.bind
+}
+
+func (s *Server) SetBind(bind string) {
+	s.bind = strings.TrimSpace(bind)
+}
+
+func (s *Server) Addr() string {
+	return fmt.Sprintf("%s:%d", s.Bind(), s.port)
+}
+
+func (s *Server) Handler() http.Handler {
 	mux := http.NewServeMux()
-
-	// Embedded Dashboard UI
 	mux.HandleFunc("/", s.handleRoot)
-
-	// REST APIs
 	mux.HandleFunc("/api/sessions", s.handleSessions)
 	mux.HandleFunc("/api/sessions/", s.handleSessionSubRoutes)
 	mux.HandleFunc("/api/events", s.handleSSE)
 	mux.HandleFunc("/api/replay", s.handleReplay)
+	return s.localOnlyMiddleware(mux)
+}
 
-	// Wrap with CORS and logging
-	handler := s.corsMiddleware(mux)
-
+func (s *Server) Start() error {
 	s.httpServer = &http.Server{
-		Addr:         fmt.Sprintf(":%d", s.port),
-		Handler:      handler,
+		Addr:         s.Addr(),
+		Handler:      s.Handler(),
 		ReadTimeout:  30 * time.Second,
 		WriteTimeout: 0, // Keep 0 for SSE long-lived connections
 	}
@@ -69,19 +87,35 @@ func (s *Server) Stop(ctx context.Context) error {
 	return nil
 }
 
-func (s *Server) corsMiddleware(next http.Handler) http.Handler {
+func (s *Server) localOnlyMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.Header().Set("Referrer-Policy", "no-referrer")
+
+		if origin := r.Header.Get("Origin"); origin != "" && !localhostOrigin(origin) {
+			http.Error(w, "origin not allowed", http.StatusForbidden)
+			return
+		}
 
 		if r.Method == http.MethodOptions {
-			w.WriteHeader(http.StatusOK)
+			w.WriteHeader(http.StatusNoContent)
 			return
 		}
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+func localhostOrigin(origin string) bool {
+	u, err := url.Parse(origin)
+	if err != nil {
+		return false
+	}
+	if u.Scheme != "http" && u.Scheme != "https" {
+		return false
+	}
+	host := u.Hostname()
+	return host == "127.0.0.1" || host == "localhost" || host == "::1"
 }
 
 func (s *Server) handleRoot(w http.ResponseWriter, r *http.Request) {
@@ -243,6 +277,24 @@ func (s *Server) handleReplay(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid JSON body: "+err.Error(), http.StatusBadRequest)
 		return
 	}
+
+	if strings.TrimSpace(req.SessionID) == "" {
+		http.Error(w, "session_id is required", http.StatusBadRequest)
+		return
+	}
+
+	session, err := s.repo.GetSession(r.Context(), req.SessionID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if session == nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	// Never trust a command from the browser. Replay the recorded session command only.
+	req.Command = session.Command
 
 	resp, err := ExecuteReplay(r.Context(), req)
 	if err != nil {

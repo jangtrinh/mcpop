@@ -15,9 +15,9 @@ import (
 	"syscall"
 	"time"
 
-	"mcpop/internal/analyzer"
-	"mcpop/internal/server"
-	"mcpop/internal/storage"
+	"github.com/jangtrinh/mcpop/internal/analyzer"
+	"github.com/jangtrinh/mcpop/internal/server"
+	"github.com/jangtrinh/mcpop/internal/storage"
 )
 
 type StdioProxy struct {
