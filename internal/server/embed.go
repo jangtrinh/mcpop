@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// Embedded modern Light Theme Dashboard with Design:OS Visuals, Charts & Diagrams
+// Embedded modern Light Theme Dashboard with Be Vietnam Pro font & Phosphor Icons
 const DashboardHTML = `<!DOCTYPE html>
 <html lang="en" class="light">
 <head>
@@ -14,6 +14,8 @@ const DashboardHTML = `<!DOCTYPE html>
   <title>MCPOp — MCP Observability & Silent Failure Catcher</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -32,12 +34,11 @@ const DashboardHTML = `<!DOCTYPE html>
       }
     }
   </script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; }
+    body { font-family: 'Be Vietnam Pro', sans-serif; font-size: 13px; }
     code, pre, .font-mono { font-family: 'JetBrains Mono', monospace; }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -47,48 +48,48 @@ const DashboardHTML = `<!DOCTYPE html>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased transition-colors duration-200 selection:bg-indigo-500 selection:text-white">
 
-  <!-- Top Navigation Bar (Meets A11y & Touch Target Floors) -->
+  <!-- Top Navigation Bar -->
   <header class="border-b border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur sticky top-0 z-30 px-6 py-3.5 flex items-center justify-between shadow-xs">
     <div class="flex items-center space-x-3.5">
       <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-md shadow-indigo-500/20 text-white font-bold" aria-hidden="true">
-        <i class="fa-solid fa-bolt text-sm"></i>
+        <i class="ph ph-lightning text-[18px]"></i>
       </div>
       <div>
         <div class="flex items-center space-x-2">
           <span class="font-extrabold tracking-tight text-slate-900 dark:text-white text-base">MCPOp</span>
           <span class="text-[11px] font-semibold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/60 px-2 py-0.5 rounded-full">Observability</span>
-          <span class="text-[10px] font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">v0.1.0</span>
+          <span class="text-[11px] font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">v0.1.0</span>
         </div>
-        <p class="text-xs text-slate-500 dark:text-slate-400">Silent Failure Catcher & Realtime Waterfall for MCP</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Silent Failure Catcher & Realtime Waterfall for MCP</p>
       </div>
     </div>
 
     <!-- Active Session, SSE Pulse & Theme Toggle -->
     <div class="flex items-center space-x-3">
       <!-- Live SSE Connection Pill -->
-      <div class="flex items-center space-x-2 text-xs bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 px-3 py-1.5 rounded-lg text-emerald-700 dark:text-emerald-400 shadow-2xs">
+      <div class="flex items-center space-x-2 text-xs bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 px-3 py-1.5 rounded-lg text-emerald-700 dark:text-emerald-400 shadow-2xs font-medium">
         <span class="relative flex h-2 w-2" aria-hidden="true">
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
           <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
         </span>
-        <span id="liveStatus" class="font-medium">Live SSE Connected</span>
+        <span id="liveStatus">Live SSE Connected</span>
       </div>
 
-      <!-- Session Picker with proper A11y and touch targets -->
-      <div class="flex items-center space-x-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-1 shadow-2xs">
+      <!-- Session Picker -->
+      <div class="flex items-center space-x-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-1 shadow-2xs">
         <label for="sessionSelect" class="sr-only">Select Session</label>
-        <i class="fa-solid fa-terminal text-xs text-slate-400 pl-2" aria-hidden="true"></i>
+        <i class="ph ph-terminal-window text-[16px] text-slate-400 pl-2" aria-hidden="true"></i>
         <select id="sessionSelect" aria-label="Target MCP Session" class="bg-transparent text-xs text-slate-700 dark:text-slate-200 font-medium py-1.5 px-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 rounded cursor-pointer min-h-[32px]">
           <option value="">Loading sessions...</option>
         </select>
         <button onclick="refreshData()" aria-label="Refresh Data" title="Refresh" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 rounded text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
-          <i class="fa-solid fa-arrows-rotate text-xs"></i>
+          <i class="ph ph-arrows-clockwise text-[16px]"></i>
         </button>
       </div>
 
       <!-- Theme Switcher -->
       <button onclick="toggleTheme()" id="themeBtn" aria-label="Toggle Dark/Light Theme" class="w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-center transition shadow-2xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
-        <i class="fa-solid fa-moon text-xs"></i>
+        <i class="ph ph-moon text-[16px]"></i>
       </button>
     </div>
   </header>
@@ -96,11 +97,11 @@ const DashboardHTML = `<!DOCTYPE html>
   <!-- Main Container -->
   <main class="flex-1 max-w-7xl w-full mx-auto p-6 space-y-6">
 
-    <!-- Interactive Architecture Flow Diagram (Design:OS Flow) -->
+    <!-- Interactive Architecture Flow Diagram -->
     <div class="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 shadow-xs">
       <div class="flex items-center justify-between mb-4">
         <div class="flex items-center space-x-2 text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-          <i class="fa-solid fa-network-wired text-indigo-600" aria-hidden="true"></i>
+          <i class="ph ph-network text-[18px] text-indigo-600" aria-hidden="true"></i>
           <span>Transparent Interceptor Topology</span>
         </div>
         <span class="text-[11px] text-slate-500 dark:text-slate-400 font-mono" id="diagCommand">Command: (waiting for session)</span>
@@ -111,45 +112,45 @@ const DashboardHTML = `<!DOCTYPE html>
         <!-- Node 1: AI Client -->
         <div class="bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 shadow-2xs">
           <div class="w-8 h-8 mx-auto rounded-lg bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-1.5" aria-hidden="true">
-            <i class="fa-solid fa-robot text-sm"></i>
+            <i class="ph ph-robot text-[18px]"></i>
           </div>
           <div class="text-xs font-bold text-slate-800 dark:text-slate-200">AI Client</div>
-          <div class="text-[10px] text-slate-500">Claude / Cursor / Agent</div>
+          <div class="text-[11px] text-slate-500">Claude / Cursor / Agent</div>
         </div>
 
         <!-- Connection Arrow 1 -->
         <div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 py-1" aria-hidden="true">
-          <span class="text-[10px] font-mono font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/80 px-2 py-0.5 rounded-full border border-indigo-200/60 dark:border-indigo-800 mb-1">stdio pipe</span>
-          <i class="fa-solid fa-arrow-right-arrow-left text-xs hidden md:block"></i>
-          <i class="fa-solid fa-arrow-down-up text-xs md:hidden"></i>
+          <span class="text-[11px] font-mono font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/80 px-2.5 py-0.5 rounded-full border border-indigo-200/60 dark:border-indigo-800 mb-1">stdio pipe</span>
+          <i class="ph ph-arrows-left-right text-[16px] hidden md:block"></i>
+          <i class="ph ph-arrows-down-up text-[16px] md:hidden"></i>
         </div>
 
         <!-- Node 2: MCPOp Engine (Hero Focus) -->
         <div class="bg-gradient-to-b from-indigo-50/80 to-white dark:from-slate-800 dark:to-slate-900 border-2 border-indigo-500/80 rounded-xl p-3.5 shadow-sm shadow-indigo-500/10 relative">
-          <div class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full tracking-wider">
+          <div class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-[11px] font-extrabold uppercase px-2.5 py-0.5 rounded-full tracking-wider shadow-xs">
             Active Proxy
           </div>
           <div class="w-8 h-8 mx-auto rounded-lg bg-indigo-600 text-white flex items-center justify-center mb-1.5 shadow-xs" aria-hidden="true">
-            <i class="fa-solid fa-shield-halved text-sm"></i>
+            <i class="ph ph-shield-check text-[18px]"></i>
           </div>
           <div class="text-xs font-bold text-indigo-950 dark:text-white">MCPOp Core</div>
-          <div class="text-[10px] text-indigo-600 dark:text-indigo-400 font-mono">&lt;1ms Overhead Interceptor</div>
+          <div class="text-[11px] text-indigo-600 dark:text-indigo-400 font-mono font-medium">&lt;1ms Overhead Interceptor</div>
         </div>
 
         <!-- Connection Arrow 2 -->
         <div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 py-1" aria-hidden="true">
-          <span class="text-[10px] font-mono font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800 mb-1">JSON-RPC 2.0</span>
-          <i class="fa-solid fa-arrow-right-arrow-left text-xs hidden md:block"></i>
-          <i class="fa-solid fa-arrow-down-up text-xs md:hidden"></i>
+          <span class="text-[11px] font-mono font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/80 px-2.5 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800 mb-1">JSON-RPC 2.0</span>
+          <i class="ph ph-arrows-left-right text-[16px] hidden md:block"></i>
+          <i class="ph ph-arrows-down-up text-[16px] md:hidden"></i>
         </div>
 
         <!-- Node 3: Target Server -->
         <div class="bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 shadow-2xs">
           <div class="w-8 h-8 mx-auto rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-1.5" aria-hidden="true">
-            <i class="fa-solid fa-server text-sm"></i>
+            <i class="ph ph-hard-drives text-[18px]"></i>
           </div>
           <div class="text-xs font-bold text-slate-800 dark:text-slate-200">Target MCP Server</div>
-          <div class="text-[10px] text-slate-500">Python / Node / Go Tools</div>
+          <div class="text-[11px] text-slate-500">Python / Node / Go Tools</div>
         </div>
       </div>
     </div>
@@ -160,12 +161,12 @@ const DashboardHTML = `<!DOCTYPE html>
         <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold">
           <span>Total Tool Invocations</span>
           <div class="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center" aria-hidden="true">
-            <i class="fa-solid fa-layer-group text-xs"></i>
+            <i class="ph ph-stack text-[16px]"></i>
           </div>
         </div>
         <div class="text-2xl font-black text-slate-900 dark:text-white mt-2" id="statTotalCalls">0</div>
-        <div class="text-[11px] text-slate-500 mt-1 flex items-center space-x-1">
-          <i class="fa-solid fa-chart-simple text-[10px] text-indigo-500" aria-hidden="true"></i>
+        <div class="text-[11px] text-slate-500 mt-1 flex items-center space-x-1.5 font-medium">
+          <i class="ph ph-chart-bar text-[16px] text-indigo-500" aria-hidden="true"></i>
           <span>Captured in real-time</span>
         </div>
       </div>
@@ -174,11 +175,11 @@ const DashboardHTML = `<!DOCTYPE html>
         <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold">
           <span>Success Reliability</span>
           <div class="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center" aria-hidden="true">
-            <i class="fa-solid fa-circle-check text-xs"></i>
+            <i class="ph ph-check-circle text-[16px]"></i>
           </div>
         </div>
         <div class="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-2" id="statSuccessRate">100%</div>
-        <div class="text-[11px] text-slate-500 mt-1 flex items-center space-x-1" id="statErrorCallsBox">
+        <div class="text-[11px] text-slate-500 mt-1 flex items-center space-x-1.5 font-medium" id="statErrorCallsBox">
           <span id="statErrorCalls">0 errors</span>
         </div>
       </div>
@@ -187,11 +188,11 @@ const DashboardHTML = `<!DOCTYPE html>
         <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold">
           <span>Average Latency</span>
           <div class="w-7 h-7 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center" aria-hidden="true">
-            <i class="fa-solid fa-stopwatch text-xs"></i>
+            <i class="ph ph-timer text-[16px]"></i>
           </div>
         </div>
         <div class="text-2xl font-black text-slate-900 dark:text-white mt-2" id="statAvgLatency">0 ms</div>
-        <div class="text-[11px] text-slate-500 mt-1 flex items-center space-x-1">
+        <div class="text-[11px] text-slate-500 mt-1 flex items-center space-x-1 font-medium">
           <span>Execution time per call</span>
         </div>
       </div>
@@ -200,17 +201,17 @@ const DashboardHTML = `<!DOCTYPE html>
         <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold">
           <span>Silent Failures Intercepted</span>
           <div class="w-7 h-7 rounded-lg bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center" aria-hidden="true">
-            <i class="fa-solid fa-triangle-exclamation text-xs"></i>
+            <i class="ph ph-warning text-[16px]"></i>
           </div>
         </div>
         <div class="text-2xl font-black text-rose-600 dark:text-rose-400 mt-2" id="statFailures">0</div>
-        <div class="text-[11px] text-slate-500 mt-1 flex items-center space-x-1">
+        <div class="text-[11px] text-slate-500 mt-1 flex items-center space-x-1 font-medium">
           <span>Loops, Schemas & Slow Tools</span>
         </div>
       </div>
     </div>
 
-    <!-- Charts & Anomaly Section (Design:OS Visual Analytics) -->
+    <!-- Charts & Anomaly Section -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       
       <!-- Chart 1: Latency Waterfall Trend (2 cols) -->
@@ -218,12 +219,12 @@ const DashboardHTML = `<!DOCTYPE html>
         <div class="flex items-center justify-between mb-4">
           <div>
             <h3 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center space-x-2">
-              <i class="fa-solid fa-chart-line text-indigo-600" aria-hidden="true"></i>
+              <i class="ph ph-chart-line-up text-[18px] text-indigo-600" aria-hidden="true"></i>
               <span>Tool Call Latency Timeline (ms)</span>
             </h3>
-            <p class="text-[11px] text-slate-500">Execution latency distribution with threshold detection</p>
+            <p class="text-[11px] text-slate-500 font-medium">Execution latency distribution with threshold detection</p>
           </div>
-          <span class="text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded">Realtime</span>
+          <span class="text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded">Realtime</span>
         </div>
         <div class="relative h-48 w-full">
           <canvas id="latencyChart" role="img" aria-label="Tool Latency Timeline Chart"></canvas>
@@ -234,10 +235,10 @@ const DashboardHTML = `<!DOCTYPE html>
       <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-xs flex flex-col justify-between">
         <div>
           <h3 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center space-x-2 mb-1">
-            <i class="fa-solid fa-chart-pie text-violet-600" aria-hidden="true"></i>
+            <i class="ph ph-chart-pie-slice text-[18px] text-violet-600" aria-hidden="true"></i>
             <span>Tool Invocation Shares</span>
           </h3>
-          <p class="text-[11px] text-slate-500 mb-3">Volume distribution across tool types</p>
+          <p class="text-[11px] text-slate-500 font-medium mb-3">Volume distribution across tool types</p>
         </div>
         <div class="relative h-44 flex items-center justify-center">
           <canvas id="toolPieChart" role="img" aria-label="Tool Invocation Share Doughnut Chart"></canvas>
@@ -248,7 +249,7 @@ const DashboardHTML = `<!DOCTYPE html>
     <!-- Failure Alerts Section -->
     <div id="failureAlertsContainer" class="hidden space-y-2.5" role="region" aria-label="Failure Alerts">
       <div class="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">
-        <i class="fa-solid fa-radiation text-rose-500" aria-hidden="true"></i>
+        <i class="ph ph-radiation text-[18px] text-rose-500" aria-hidden="true"></i>
         <span>Heuristic Anomaly Detections (Immediate Action Required)</span>
       </div>
       <div id="failureAlertsList" class="space-y-2"></div>
@@ -261,11 +262,11 @@ const DashboardHTML = `<!DOCTYPE html>
           <h2 class="text-sm font-bold text-slate-900 dark:text-white flex items-center space-x-2">
             <span>Live Tool Trace Waterfall</span>
           </h2>
-          <span id="traceCountBadge" class="text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2.5 py-0.5 rounded-full font-mono font-medium">0 traces</span>
+          <span id="traceCountBadge" class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2.5 py-0.5 rounded-full font-mono font-semibold">0 traces</span>
         </div>
 
         <div class="flex items-center space-x-2.5">
-          <!-- Filter Buttons with accessible states -->
+          <!-- Filter Buttons -->
           <div class="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300" role="group" aria-label="Filter traces">
             <button onclick="setFilter('all')" id="filterAll" class="px-3 py-1.5 rounded-md bg-white dark:bg-slate-700 shadow-2xs text-slate-900 dark:text-white font-semibold transition focus:outline-none focus:ring-2 focus:ring-indigo-500/20">All</button>
             <button onclick="setFilter('errors')" id="filterErrors" class="px-3 py-1.5 rounded-md hover:text-slate-900 dark:hover:text-white transition focus:outline-none focus:ring-2 focus:ring-indigo-500/20">Errors</button>
@@ -274,7 +275,7 @@ const DashboardHTML = `<!DOCTYPE html>
 
           <div class="relative">
             <label for="searchTraces" class="sr-only">Search tool traces</label>
-            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs" aria-hidden="true"></i>
+            <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[16px]" aria-hidden="true"></i>
             <input id="searchTraces" oninput="renderTraces()" type="text" placeholder="Search tools..." aria-label="Search tools by name" class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-xs rounded-lg pl-8 pr-3 py-1.5 text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 w-44 min-h-[32px]">
           </div>
         </div>
@@ -303,7 +304,7 @@ const DashboardHTML = `<!DOCTYPE html>
 
   </main>
 
-  <!-- Tool Detail & Replay Drawer Modal (Meets Dialog A11y & Escape Key Floors) -->
+  <!-- Tool Detail & Replay Drawer Modal -->
   <div id="detailModal" onclick="handleBackdropClick(event)" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="modalToolName">
     <div id="modalCard" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-3xl w-full shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
       
@@ -312,10 +313,10 @@ const DashboardHTML = `<!DOCTYPE html>
         <div class="flex items-center space-x-2.5">
           <div class="w-3 h-3 rounded-full bg-indigo-600" aria-hidden="true"></div>
           <h3 class="font-bold text-slate-900 dark:text-white text-base font-mono" id="modalToolName">tool/name</h3>
-          <span id="modalStatusBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase"></span>
+          <span id="modalStatusBadge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase"></span>
         </div>
         <button onclick="closeModal()" aria-label="Close dialog" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
-          <i class="fa-solid fa-xmark text-base"></i>
+          <i class="ph ph-x text-[18px]"></i>
         </button>
       </div>
 
@@ -323,9 +324,9 @@ const DashboardHTML = `<!DOCTYPE html>
       <div class="p-6 overflow-y-auto space-y-5 text-xs">
         <div>
           <div class="flex items-center justify-between mb-1.5">
-            <label for="modalArgsInput" class="block text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider text-[10px]">Input Arguments (Editable JSON)</label>
+            <label for="modalArgsInput" class="block text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider text-[11px]">Input Arguments (Editable JSON)</label>
             <button onclick="copyArgsJSON()" id="btnCopyArgs" class="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline flex items-center space-x-1 font-sans font-semibold">
-              <i class="fa-solid fa-copy text-[10px]"></i>
+              <i class="ph ph-copy text-[16px]"></i>
               <span id="copyArgsText">Copy JSON</span>
             </button>
           </div>
@@ -333,7 +334,7 @@ const DashboardHTML = `<!DOCTYPE html>
         </div>
 
         <div>
-          <label class="block text-slate-600 dark:text-slate-400 font-bold mb-1.5 uppercase tracking-wider text-[10px]">Execution Result Payload</label>
+          <label class="block text-slate-600 dark:text-slate-400 font-bold mb-1.5 uppercase tracking-wider text-[11px]">Execution Result Payload</label>
           <pre id="modalResultText" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 font-mono text-emerald-600 dark:text-emerald-400 text-xs overflow-x-auto max-h-48 whitespace-pre-wrap"></pre>
         </div>
 
@@ -353,7 +354,7 @@ const DashboardHTML = `<!DOCTYPE html>
         <div class="flex items-center space-x-2">
           <button onclick="closeModal()" class="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition shadow-2xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20">Close</button>
           <button id="btnReplay" onclick="runReplay()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center space-x-2 shadow-md shadow-indigo-500/20 focus:outline-none focus:ring-2 focus:ring-indigo-500/30">
-            <i class="fa-solid fa-play text-[10px]"></i>
+            <i class="ph ph-play text-[16px]"></i>
             <span>1-Click Replay</span>
           </button>
         </div>
@@ -377,12 +378,12 @@ const DashboardHTML = `<!DOCTYPE html>
       if (html.classList.contains('dark')) {
         html.classList.remove('dark');
         html.classList.add('light');
-        document.getElementById('themeBtn').innerHTML = '<i class="fa-solid fa-moon text-xs"></i>';
+        document.getElementById('themeBtn').innerHTML = '<i class="ph ph-moon text-[16px]"></i>';
         localStorage.setItem('theme', 'light');
       } else {
         html.classList.remove('light');
         html.classList.add('dark');
-        document.getElementById('themeBtn').innerHTML = '<i class="fa-solid fa-sun text-xs"></i>';
+        document.getElementById('themeBtn').innerHTML = '<i class="ph ph-sun text-[16px]"></i>';
         localStorage.setItem('theme', 'dark');
       }
       updateChartsTheme();
@@ -489,21 +490,21 @@ const DashboardHTML = `<!DOCTYPE html>
       failures.forEach(f => {
         const div = document.createElement('div');
         let badgeColor = 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-800/80';
-        let icon = 'fa-repeat';
+        let icon = 'ph-repeat';
         if (f.failure_type === 'schema_mismatch') {
           badgeColor = 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800/80';
-          icon = 'fa-file-code';
+          icon = 'ph-code';
         } else if (f.failure_type === 'slow_tool') {
           badgeColor = 'bg-orange-50 dark:bg-orange-950/40 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800/80';
-          icon = 'fa-hourglass-half';
+          icon = 'ph-hourglass';
         }
 
         div.className = 'p-3.5 rounded-xl border flex items-start space-x-3.5 shadow-2xs ' + badgeColor;
-        div.innerHTML = '<i class="fa-solid ' + icon + ' mt-0.5 text-base" aria-hidden="true"></i>' +
+        div.innerHTML = '<i class="ph ' + icon + ' mt-0.5 text-[18px]"></i>' +
           '<div class="flex-1">' +
             '<div class="flex items-center justify-between">' +
               '<span class="font-bold text-xs uppercase tracking-wider">' + f.failure_type.replace('_', ' ') + '</span>' +
-              '<span class="text-[10px] font-mono opacity-80">' + new Date(f.created_at).toLocaleTimeString() + '</span>' +
+              '<span class="text-[11px] font-mono opacity-80">' + new Date(f.created_at).toLocaleTimeString() + '</span>' +
             '</div>' +
             '<p class="text-xs mt-1 font-medium">' + f.description + '</p>' +
           '</div>';
@@ -546,11 +547,11 @@ const DashboardHTML = `<!DOCTYPE html>
         const tr = document.createElement('tr');
         tr.className = 'hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition cursor-pointer';
 
-        let statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">SUCCESS</span>';
+        let statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">SUCCESS</span>';
         if (t.is_error || t.status === 'failed') {
-          statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800">FAILED</span>';
+          statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800">FAILED</span>';
         } else if (t.status === 'pending') {
-          statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 animate-pulse">RUNNING</span>';
+          statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 animate-pulse">RUNNING</span>';
         }
 
         let latColor = 'text-emerald-600 dark:text-emerald-400';
@@ -634,11 +635,11 @@ const DashboardHTML = `<!DOCTYPE html>
           scales: {
             x: {
               grid: { color: gridColor },
-              ticks: { color: textColor, font: { size: 10 } }
+              ticks: { color: textColor, font: { family: 'Be Vietnam Pro', size: 11 } }
             },
             y: {
               grid: { color: gridColor },
-              ticks: { color: textColor, font: { size: 10 } },
+              ticks: { color: textColor, font: { family: 'Be Vietnam Pro', size: 11 } },
               beginAtZero: true
             }
           }
@@ -674,7 +675,7 @@ const DashboardHTML = `<!DOCTYPE html>
           plugins: {
             legend: {
               position: 'bottom',
-              labels: { color: textColor, boxWidth: 10, font: { size: 10 } }
+              labels: { color: textColor, boxWidth: 10, font: { family: 'Be Vietnam Pro', size: 11 } }
             }
           },
           cutout: '65%'
@@ -697,10 +698,10 @@ const DashboardHTML = `<!DOCTYPE html>
       const statusBadge = document.getElementById('modalStatusBadge');
       if (trace.is_error) {
         statusBadge.textContent = 'Failed';
-        statusBadge.className = 'text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase bg-rose-100 text-rose-700 border border-rose-200';
+        statusBadge.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase bg-rose-100 text-rose-700 border border-rose-200';
       } else {
         statusBadge.textContent = 'Success';
-        statusBadge.className = 'text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase bg-emerald-100 text-emerald-700 border border-emerald-200';
+        statusBadge.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase bg-emerald-100 text-emerald-700 border border-emerald-200';
       }
 
       try {
@@ -745,7 +746,7 @@ const DashboardHTML = `<!DOCTYPE html>
       const lat = document.getElementById('replayLatencyBadge');
 
       btn.disabled = true;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xs"></i> <span>Replaying...</span>';
+      btn.innerHTML = '<i class="ph ph-spinner animate-spin text-[16px]"></i> <span>Replaying...</span>';
 
       const session = sessions.find(s => s.id === currentSessionId);
       const command = session ? session.command : '';
@@ -756,7 +757,7 @@ const DashboardHTML = `<!DOCTYPE html>
       } catch (e) {
         alert('Invalid JSON in arguments');
         btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-play text-[10px]"></i> <span>1-Click Replay</span>';
+        btn.innerHTML = '<i class="ph ph-play text-[16px]"></i> <span>1-Click Replay</span>';
         return;
       }
 
@@ -781,7 +782,7 @@ const DashboardHTML = `<!DOCTYPE html>
         out.textContent = 'Replay failed: ' + err.message;
       } finally {
         btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-play text-[10px]"></i> <span>1-Click Replay</span>';
+        btn.innerHTML = '<i class="ph ph-play text-[16px]"></i> <span>1-Click Replay</span>';
       }
     }
 
