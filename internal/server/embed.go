@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// Embedded premium lean Neutral B&W Dashboard with Design:OS Visuals
+// Embedded sleek Neutral B&W Dashboard with Functional Semantic Signals (Green/Red/Amber)
 const DashboardHTML = `<!DOCTYPE html>
 <html lang="en" class="light">
 <head>
@@ -67,14 +67,17 @@ const DashboardHTML = `<!DOCTYPE html>
 
     <!-- Actions & Controls -->
     <div class="flex items-center space-x-2.5">
-      <!-- Live SSE Status -->
-      <div class="flex items-center space-x-1.5 text-neutral-600 dark:text-neutral-400 px-2 py-1 rounded bg-neutral-100 dark:bg-neutral-800 font-mono text-[11px]">
-        <span class="w-1.5 h-1.5 rounded-full bg-neutral-950 dark:bg-white animate-pulse"></span>
+      <!-- Live SSE Status Indicator (Semantic Green) -->
+      <div class="flex items-center space-x-1.5 text-xs bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 px-2.5 py-1 rounded text-emerald-700 dark:text-emerald-400 font-mono text-[11px] font-medium">
+        <span class="relative flex h-2 w-2" aria-hidden="true">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
+        </span>
         <span id="liveStatus">Live</span>
       </div>
 
       <!-- Session Picker -->
-      <div class="flex items-center space-x-1 bg-neutral-100 dark:bg-neutral-800 rounded px-1 py-0.5">
+      <div class="flex items-center space-x-1 bg-neutral-100 dark:bg-neutral-800 rounded px-1 py-0.5 border border-neutral-200 dark:border-neutral-700">
         <label for="sessionSelect" class="sr-only">Session</label>
         <select id="sessionSelect" aria-label="MCP Session" class="bg-transparent text-xs text-neutral-800 dark:text-neutral-200 font-medium py-1 px-1.5 focus:outline-none cursor-pointer">
           <option value="">Loading...</option>
@@ -94,33 +97,45 @@ const DashboardHTML = `<!DOCTYPE html>
   <!-- Main Container -->
   <main class="flex-1 max-w-7xl w-full mx-auto p-5 space-y-4">
 
-    <!-- KPI Strip (Compact, High-Information Density) -->
+    <!-- KPI Strip (Compact, High-Information Density with Semantic Accents) -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
       <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3 shadow-2xs">
-        <div class="text-[11px] text-neutral-500 font-medium uppercase tracking-wider">Total Calls</div>
+        <div class="flex items-center justify-between text-[11px] text-neutral-500 font-medium uppercase tracking-wider">
+          <span>Total Calls</span>
+          <i class="ph ph-stack text-[15px] text-neutral-400"></i>
+        </div>
         <div class="text-xl font-bold text-neutral-950 dark:text-white mt-1 font-mono" id="statTotalCalls">0</div>
       </div>
 
       <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3 shadow-2xs">
-        <div class="text-[11px] text-neutral-500 font-medium uppercase tracking-wider">Reliability</div>
-        <div class="text-xl font-bold text-neutral-950 dark:text-white mt-1 font-mono" id="statSuccessRate">100%</div>
+        <div class="flex items-center justify-between text-[11px] text-neutral-500 font-medium uppercase tracking-wider">
+          <span>Reliability</span>
+          <i class="ph ph-check-circle text-[15px] text-emerald-500"></i>
+        </div>
+        <div class="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-1 font-mono" id="statSuccessRate">100%</div>
       </div>
 
       <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3 shadow-2xs">
-        <div class="text-[11px] text-neutral-500 font-medium uppercase tracking-wider">Avg Latency</div>
+        <div class="flex items-center justify-between text-[11px] text-neutral-500 font-medium uppercase tracking-wider">
+          <span>Avg Latency</span>
+          <i class="ph ph-timer text-[15px] text-neutral-400"></i>
+        </div>
         <div class="text-xl font-bold text-neutral-950 dark:text-white mt-1 font-mono" id="statAvgLatency">0 ms</div>
       </div>
 
       <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3 shadow-2xs">
-        <div class="text-[11px] text-neutral-500 font-medium uppercase tracking-wider">Silent Failures</div>
+        <div class="flex items-center justify-between text-[11px] text-neutral-500 font-medium uppercase tracking-wider">
+          <span>Silent Failures</span>
+          <i class="ph ph-warning-circle text-[15px] text-rose-500" id="statFailuresIcon"></i>
+        </div>
         <div class="text-xl font-bold text-neutral-950 dark:text-white mt-1 font-mono" id="statFailures">0</div>
       </div>
     </div>
 
-    <!-- Design:OS Lean Signal Track Diagram (Inline, Artful & Architectural) -->
+    <!-- Design:OS Lean Signal Track Diagram (Inline Topology with Semantic Signals) -->
     <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs shadow-2xs">
       <div class="flex items-center space-x-2 font-mono">
-        <span class="w-2 h-2 rounded-full bg-neutral-950 dark:bg-white animate-pulse"></span>
+        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
         <span class="font-bold text-neutral-950 dark:text-white text-[11px] uppercase tracking-wider">Topology</span>
       </div>
 
@@ -129,12 +144,12 @@ const DashboardHTML = `<!DOCTYPE html>
           <i class="ph ph-robot text-[14px]"></i>
           <span>Client (stdio)</span>
         </div>
-        <span class="text-neutral-400 dark:text-neutral-600">→</span>
+        <span class="text-neutral-400 dark:text-neutral-600 font-mono">──►</span>
         <div class="flex items-center space-x-1.5 bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 px-2.5 py-1 rounded font-bold shadow-xs">
-          <i class="ph ph-shield-check text-[14px]"></i>
+          <i class="ph ph-shield-check text-[14px] text-emerald-400 dark:text-emerald-600"></i>
           <span>MCPOp Interceptor</span>
         </div>
-        <span class="text-neutral-400 dark:text-neutral-600">→</span>
+        <span class="text-neutral-400 dark:text-neutral-600 font-mono">──►</span>
         <div class="flex items-center space-x-1.5 bg-neutral-100 dark:bg-neutral-800 px-2.5 py-1 rounded border border-neutral-200 dark:border-neutral-700">
           <i class="ph ph-hard-drives text-[14px]"></i>
           <span id="pipelineTarget">Target Server</span>
@@ -142,12 +157,12 @@ const DashboardHTML = `<!DOCTYPE html>
       </div>
 
       <div class="flex items-center space-x-3 text-[11px] text-neutral-500 font-mono">
-        <span>Overhead: <strong class="text-neutral-900 dark:text-neutral-100">&lt;0.5ms</strong></span>
+        <span>Overhead: <strong class="text-emerald-600 dark:text-emerald-400">&lt;0.5ms</strong></span>
         <span>Spec: <strong class="text-neutral-900 dark:text-neutral-100">JSON-RPC 2.0</strong></span>
       </div>
     </div>
 
-    <!-- Design:OS Lean Visual Telemetry & Analytics Grid -->
+    <!-- Design:OS Visual Telemetry & Analytics Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
       <!-- Latency Timeline Line Chart (2 Cols) -->
       <div class="lg:col-span-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3.5 shadow-2xs">
@@ -167,7 +182,7 @@ const DashboardHTML = `<!DOCTYPE html>
         </div>
       </div>
 
-      <!-- Tool Share Mini Doughnut Chart (1 Col) -->
+      <!-- Tool Share Doughnut Chart (1 Col) -->
       <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3.5 shadow-2xs flex flex-col justify-between">
         <div class="flex items-center justify-between mb-1">
           <div class="flex items-center space-x-2">
@@ -182,7 +197,7 @@ const DashboardHTML = `<!DOCTYPE html>
       </div>
     </div>
 
-    <!-- Failure Alerts Strip (Appears only when issues occur) -->
+    <!-- Failure Alerts Strip (Semantic Colors: Red for Loops, Amber for Schema Mismatches, Orange for Slow Tools) -->
     <div id="failureAlertsContainer" class="hidden space-y-2" role="region" aria-label="Failure Alerts">
       <div id="failureAlertsList" class="space-y-2"></div>
     </div>
@@ -199,10 +214,10 @@ const DashboardHTML = `<!DOCTYPE html>
 
         <div class="flex items-center space-x-2">
           <!-- Filter Tabs -->
-          <div class="flex items-center bg-neutral-100 dark:bg-neutral-800 p-0.5 rounded text-xs" role="group">
+          <div class="flex items-center bg-neutral-100 dark:bg-neutral-800 p-0.5 rounded text-xs border border-neutral-200 dark:border-neutral-700" role="group">
             <button onclick="setFilter('all')" id="filterAll" class="px-2.5 py-1 rounded bg-white dark:bg-neutral-700 shadow-2xs text-neutral-950 dark:text-white font-bold">All</button>
-            <button onclick="setFilter('errors')" id="filterErrors" class="px-2.5 py-1 rounded text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white font-medium">Errors</button>
-            <button onclick="setFilter('slow')" id="filterSlow" class="px-2.5 py-1 rounded text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white font-medium">Slow</button>
+            <button onclick="setFilter('errors')" id="filterErrors" class="px-2.5 py-1 rounded text-neutral-600 dark:text-neutral-400 hover:text-rose-600 dark:hover:text-rose-400 font-medium">Errors</button>
+            <button onclick="setFilter('slow')" id="filterSlow" class="px-2.5 py-1 rounded text-neutral-600 dark:text-neutral-400 hover:text-amber-600 dark:hover:text-amber-400 font-medium">Slow</button>
           </div>
 
           <!-- Search -->
@@ -217,7 +232,7 @@ const DashboardHTML = `<!DOCTYPE html>
         <table class="w-full text-left text-xs" role="table">
           <thead class="bg-neutral-50 dark:bg-neutral-950/80 text-neutral-500 dark:text-neutral-400 border-b border-neutral-200 dark:border-neutral-800 font-semibold">
             <tr>
-              <th scope="col" class="py-2.5 px-4 w-20">Status</th>
+              <th scope="col" class="py-2.5 px-4 w-24">Status</th>
               <th scope="col" class="py-2.5 px-4 w-44">Tool Name</th>
               <th scope="col" class="py-2.5 px-4">Arguments Payload</th>
               <th scope="col" class="py-2.5 px-4 w-32">Latency</th>
@@ -393,9 +408,28 @@ const DashboardHTML = `<!DOCTYPE html>
     function renderStats(stats) {
       if (!stats) return;
       document.getElementById('statTotalCalls').textContent = stats.total_calls || 0;
-      document.getElementById('statSuccessRate').textContent = (stats.success_rate || 100).toFixed(0) + '%';
+      
+      const succRate = stats.success_rate || 100;
+      const rateEl = document.getElementById('statSuccessRate');
+      rateEl.textContent = succRate.toFixed(0) + '%';
+      if (succRate < 80) {
+        rateEl.className = 'text-xl font-bold text-rose-600 dark:text-rose-400 mt-1 font-mono';
+      } else if (succRate < 95) {
+        rateEl.className = 'text-xl font-bold text-amber-600 dark:text-amber-400 mt-1 font-mono';
+      } else {
+        rateEl.className = 'text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-1 font-mono';
+      }
+
       document.getElementById('statAvgLatency').textContent = (stats.avg_latency_ms || 0) + ' ms';
-      document.getElementById('statFailures').textContent = stats.failure_count || 0;
+      
+      const failCount = stats.failure_count || 0;
+      const failEl = document.getElementById('statFailures');
+      failEl.textContent = failCount;
+      if (failCount > 0) {
+        failEl.className = 'text-xl font-bold text-rose-600 dark:text-rose-400 mt-1 font-mono';
+      } else {
+        failEl.className = 'text-xl font-bold text-neutral-950 dark:text-white mt-1 font-mono';
+      }
 
       const curr = sessions.find(s => s.id === currentSessionId);
       if (curr) {
@@ -416,12 +450,23 @@ const DashboardHTML = `<!DOCTYPE html>
 
       failures.forEach(f => {
         const div = document.createElement('div');
-        div.className = 'p-2.5 rounded border border-neutral-300 dark:border-neutral-700 bg-neutral-100/90 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 flex items-start space-x-2.5';
+        let icon = 'ph-repeat';
+        let alertColor = 'bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border-rose-200 dark:border-rose-800/80';
+        if (f.failure_type === 'schema_mismatch') {
+          icon = 'ph-code';
+          alertColor = 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-800/80';
+        } else if (f.failure_type === 'slow_tool') {
+          icon = 'ph-hourglass';
+          alertColor = 'bg-orange-50 dark:bg-orange-950/40 text-orange-800 dark:text-orange-300 border-orange-200 dark:border-orange-800/80';
+        }
+
+        div.className = 'p-3 rounded-lg border flex items-start space-x-3 shadow-2xs ' + alertColor;
         div.innerHTML = 
+          '<i class="ph-bold ' + icon + ' mt-0.5 text-[16px]"></i>' +
           '<div class="flex-1">' +
             '<div class="flex items-center justify-between">' +
               '<span class="font-bold text-[11px] uppercase tracking-wider font-mono">' + f.failure_type.replace('_', ' ') + '</span>' +
-              '<span class="text-[11px] font-mono opacity-60">' + new Date(f.created_at).toLocaleTimeString() + '</span>' +
+              '<span class="text-[11px] font-mono opacity-70">' + new Date(f.created_at).toLocaleTimeString() + '</span>' +
             '</div>' +
             '<p class="text-xs mt-0.5 font-medium">' + f.description + '</p>' +
           '</div>';
@@ -464,11 +509,12 @@ const DashboardHTML = `<!DOCTYPE html>
         const tr = document.createElement('tr');
         tr.className = 'hover:bg-neutral-100/60 dark:hover:bg-neutral-800/40 transition cursor-pointer';
 
-        let statusBadge = '<span class="px-1.5 py-0.5 rounded text-[11px] font-bold bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200">OK</span>';
+        // Semantic Status Badges
+        let statusBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">SUCCESS</span>';
         if (t.is_error || t.status === 'failed') {
-          statusBadge = '<span class="px-1.5 py-0.5 rounded text-[11px] font-bold bg-neutral-950 text-white dark:bg-white dark:text-black">FAIL</span>';
+          statusBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800">FAILED</span>';
         } else if (t.status === 'pending') {
-          statusBadge = '<span class="px-1.5 py-0.5 rounded text-[11px] font-bold bg-neutral-100 dark:bg-neutral-800 text-neutral-500 animate-pulse">RUN</span>';
+          statusBadge = '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 animate-pulse">RUNNING</span>';
         }
 
         let argsPreview = t.arguments;
@@ -476,7 +522,19 @@ const DashboardHTML = `<!DOCTYPE html>
           argsPreview = argsPreview.substring(0, 50) + '...';
         }
 
+        // Semantic Latency Bar & Colors
+        let latColor = 'text-emerald-600 dark:text-emerald-400';
+        let barColor = 'bg-emerald-500';
         let barWidth = Math.min(100, Math.max(8, (t.latency_ms / 3000) * 100));
+
+        if (t.latency_ms > 1000) {
+          latColor = 'text-amber-600 dark:text-amber-400';
+          barColor = 'bg-amber-500';
+        }
+        if (t.latency_ms >= 3000) {
+          latColor = 'text-rose-600 dark:text-rose-400 font-bold';
+          barColor = 'bg-rose-500';
+        }
 
         tr.innerHTML = 
           '<td class="py-2.5 px-4">' + statusBadge + '</td>' +
@@ -484,9 +542,9 @@ const DashboardHTML = `<!DOCTYPE html>
           '<td class="py-2.5 px-4 text-neutral-500 truncate max-w-sm">' + argsPreview + '</td>' +
           '<td class="py-2.5 px-4 font-mono">' +
             '<div class="flex items-center space-x-2">' +
-              '<span class="font-bold text-neutral-900 dark:text-neutral-100">' + t.latency_ms + 'ms</span>' +
-              '<div class="w-10 bg-neutral-200 dark:bg-neutral-800 h-1 rounded-full overflow-hidden" aria-hidden="true">' +
-                '<div class="bg-neutral-950 dark:bg-neutral-300 h-full rounded-full" style="width: ' + barWidth + '%"></div>' +
+              '<span class="font-bold ' + latColor + '">' + t.latency_ms + 'ms</span>' +
+              '<div class="w-12 bg-neutral-200 dark:bg-neutral-800 h-1.5 rounded-full overflow-hidden" aria-hidden="true">' +
+                '<div class="' + barColor + ' h-full rounded-full" style="width: ' + barWidth + '%"></div>' +
               '</div>' +
             '</div>' +
           '</td>' +
@@ -508,7 +566,7 @@ const DashboardHTML = `<!DOCTYPE html>
       const textColor = isDark ? '#a1a1aa' : '#71717a';
       const lineColor = isDark ? '#ffffff' : '#18181b';
 
-      // Calculate Percentiles
+      // Percentiles
       const latencies = traces.map(t => t.latency_ms).sort((a, b) => a - b);
       if (latencies.length > 0) {
         const p50 = latencies[Math.floor(latencies.length * 0.50)] || 0;
@@ -609,10 +667,10 @@ const DashboardHTML = `<!DOCTYPE html>
       const statusBadge = document.getElementById('modalStatusBadge');
       if (trace.is_error) {
         statusBadge.textContent = 'Failed';
-        statusBadge.className = 'text-[11px] font-bold px-2 py-0.5 rounded bg-neutral-950 text-white dark:bg-white dark:text-black font-mono';
+        statusBadge.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded uppercase bg-rose-100 text-rose-700 border border-rose-200 font-mono';
       } else {
         statusBadge.textContent = 'Success';
-        statusBadge.className = 'text-[11px] font-bold px-2 py-0.5 rounded bg-neutral-200 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100 font-mono';
+        statusBadge.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded uppercase bg-emerald-100 text-emerald-700 border border-emerald-200 font-mono';
       }
 
       try {
