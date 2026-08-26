@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"mcpop/internal/proxy"
-	"mcpop/internal/storage"
+	"github.com/jangtrinh/mcpop/internal/proxy"
+	"github.com/jangtrinh/mcpop/internal/storage"
 )
 
 func TestStdioProxyWithMockServer(t *testing.T) {

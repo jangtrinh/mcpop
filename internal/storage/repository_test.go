@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"mcpop/internal/storage"
+	"github.com/jangtrinh/mcpop/internal/storage"
 )
 
 func TestStorageWorkflow(t *testing.T) {

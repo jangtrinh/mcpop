@@ -7,20 +7,20 @@ import (
 	"sync"
 	"time"
 
-	"mcpop/internal/storage"
+	"github.com/jangtrinh/mcpop/internal/storage"
 )
 
 // ToolSchema represents JSON Schema of a tool in MCP
 type ToolSchema struct {
-	Name        string                 `json:"name"`
-	Description string                 `json:"description"`
-	InputSchema *JSONSchemaObject      `json:"inputSchema,omitempty"`
+	Name        string            `json:"name"`
+	Description string            `json:"description"`
+	InputSchema *JSONSchemaObject `json:"inputSchema,omitempty"`
 }
 
 type JSONSchemaObject struct {
-	Type       string                     `json:"type"`
-	Properties map[string]JSONProperty    `json:"properties,omitempty"`
-	Required   []string                   `json:"required,omitempty"`
+	Type       string                  `json:"type"`
+	Properties map[string]JSONProperty `json:"properties,omitempty"`
+	Required   []string                `json:"required,omitempty"`
 }
 
 type JSONProperty struct {
@@ -37,12 +37,12 @@ type CallHistoryItem struct {
 }
 
 type Engine struct {
-	repo           *storage.Repository
-	schemaCache    sync.Map // map[string]map[string]ToolSchema (sessionID -> toolName -> ToolSchema)
-	historyCache   sync.Map // map[string][]*CallHistoryItem (sessionID -> history)
+	repo            *storage.Repository
+	schemaCache     sync.Map // map[string]map[string]ToolSchema (sessionID -> toolName -> ToolSchema)
+	historyCache    sync.Map // map[string][]*CallHistoryItem (sessionID -> history)
 	slowThresholdMs int64
-	onFailure      func(failure *storage.Failure)
-	mu             sync.Mutex
+	onFailure       func(failure *storage.Failure)
+	mu              sync.Mutex
 }
 
 func NewEngine(repo *storage.Repository, slowThresholdMs int64) *Engine {

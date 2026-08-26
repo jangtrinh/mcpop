@@ -1,7 +1,7 @@
 # Binaries
 bin/
 dist/
-mcpop
+/mcpop
 
 # SQLite databases
 *.db

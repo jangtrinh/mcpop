@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"mcpop/internal/analyzer"
-	"mcpop/internal/storage"
+	"github.com/jangtrinh/mcpop/internal/analyzer"
+	"github.com/jangtrinh/mcpop/internal/storage"
 )
 
 func setupTestRepo(t *testing.T) (*storage.Repository, string) {

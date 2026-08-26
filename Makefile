@@ -10,7 +10,7 @@ build:
 	go build -o $(BUILD_DIR)/$(BINARY_NAME) ./cmd/mcpop
 
 test:
-	go test -v ./...
+	go test -race -count=1 ./...
 
 tidy:
 	go mod tidy

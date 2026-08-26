@@ -319,6 +319,15 @@ const DashboardHTML = `<!DOCTYPE html>
     let latencyChartInstance = null;
     let toolPieChartInstance = null;
 
+    function esc(value) {
+      return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     function toggleTheme() {
       const html = document.documentElement;
       if (html.classList.contains('dark')) {
@@ -461,15 +470,33 @@ const DashboardHTML = `<!DOCTYPE html>
         }
 
         div.className = 'p-3 rounded-lg border flex items-start space-x-3 shadow-2xs ' + alertColor;
-        div.innerHTML = 
-          '<i class="ph-bold ' + icon + ' mt-0.5 text-[16px]"></i>' +
-          '<div class="flex-1">' +
-            '<div class="flex items-center justify-between">' +
-              '<span class="font-bold text-[11px] uppercase tracking-wider font-mono">' + f.failure_type.replace('_', ' ') + '</span>' +
-              '<span class="text-[11px] font-mono opacity-70">' + new Date(f.created_at).toLocaleTimeString() + '</span>' +
-            '</div>' +
-            '<p class="text-xs mt-0.5 font-medium">' + f.description + '</p>' +
-          '</div>';
+        const iconEl = document.createElement('i');
+        iconEl.className = 'ph-bold ' + icon + ' mt-0.5 text-[16px]';
+
+        const wrap = document.createElement('div');
+        wrap.className = 'flex-1';
+
+        const head = document.createElement('div');
+        head.className = 'flex items-center justify-between';
+
+        const typeEl = document.createElement('span');
+        typeEl.className = 'font-bold text-[11px] uppercase tracking-wider font-mono';
+        typeEl.textContent = String(f.failure_type || '').replace('_', ' ');
+
+        const timeEl = document.createElement('span');
+        timeEl.className = 'text-[11px] font-mono opacity-70';
+        timeEl.textContent = new Date(f.created_at).toLocaleTimeString();
+
+        const desc = document.createElement('p');
+        desc.className = 'text-xs mt-0.5 font-medium';
+        desc.textContent = f.description || '';
+
+        head.appendChild(typeEl);
+        head.appendChild(timeEl);
+        wrap.appendChild(head);
+        wrap.appendChild(desc);
+        div.appendChild(iconEl);
+        div.appendChild(wrap);
         list.appendChild(div);
       });
     }
@@ -536,22 +563,31 @@ const DashboardHTML = `<!DOCTYPE html>
           barColor = 'bg-rose-500';
         }
 
-        tr.innerHTML = 
+        tr.innerHTML =
           '<td class="py-2.5 px-4">' + statusBadge + '</td>' +
-          '<td class="py-2.5 px-4 font-bold text-neutral-950 dark:text-white">' + t.tool_name + '</td>' +
-          '<td class="py-2.5 px-4 text-neutral-500 truncate max-w-sm">' + argsPreview + '</td>' +
+          '<td class="py-2.5 px-4 font-bold text-neutral-950 dark:text-white">' + esc(t.tool_name) + '</td>' +
+          '<td class="py-2.5 px-4 text-neutral-500 truncate max-w-sm">' + esc(argsPreview) + '</td>' +
           '<td class="py-2.5 px-4 font-mono">' +
             '<div class="flex items-center space-x-2">' +
-              '<span class="font-bold ' + latColor + '">' + t.latency_ms + 'ms</span>' +
+              '<span class="font-bold ' + latColor + '">' + esc(t.latency_ms) + 'ms</span>' +
               '<div class="w-12 bg-neutral-200 dark:bg-neutral-800 h-1.5 rounded-full overflow-hidden" aria-hidden="true">' +
                 '<div class="' + barColor + ' h-full rounded-full" style="width: ' + barWidth + '%"></div>' +
               '</div>' +
             '</div>' +
           '</td>' +
-          '<td class="py-2.5 px-4 text-neutral-400 text-[11px]">' + new Date(t.created_at).toLocaleTimeString() + '</td>' +
-          '<td class="py-2.5 px-4 text-right space-x-1 font-sans">' +
-            '<button onclick="inspectTrace(\'' + t.id + '\')" aria-label="Inspect" class="px-2.5 py-1 rounded border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-900 dark:text-neutral-100 text-[11px] font-semibold">Inspect</button>' +
-          '</td>';
+          '<td class="py-2.5 px-4 text-neutral-400 text-[11px]">' + esc(new Date(t.created_at).toLocaleTimeString()) + '</td>' +
+          '<td class="py-2.5 px-4 text-right space-x-1 font-sans"></td>';
+
+        const inspectBtn = document.createElement('button');
+        inspectBtn.type = 'button';
+        inspectBtn.setAttribute('aria-label', 'Inspect');
+        inspectBtn.className = 'px-2.5 py-1 rounded border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-900 dark:text-neutral-100 text-[11px] font-semibold';
+        inspectBtn.textContent = 'Inspect';
+        inspectBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          inspectTrace(t.id);
+        });
+        tr.lastElementChild.appendChild(inspectBtn);
 
         tr.onclick = (e) => {
           if (e.target.tagName !== 'BUTTON') inspectTrace(t.id);
@@ -713,9 +749,6 @@ const DashboardHTML = `<!DOCTYPE html>
       btn.disabled = true;
       btn.innerHTML = '<i class="ph ph-spinner animate-spin text-[14px]"></i> <span>Replaying...</span>';
 
-      const session = sessions.find(s => s.id === currentSessionId);
-      const command = session ? session.command : '';
-
       let parsedArgs = {};
       try {
         parsedArgs = JSON.parse(document.getElementById('modalArgsInput').value);
@@ -731,7 +764,7 @@ const DashboardHTML = `<!DOCTYPE html>
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            command: command,
+            session_id: currentSessionId,
             tool_name: currentModalTrace.tool_name,
             arguments: parsedArgs
           })

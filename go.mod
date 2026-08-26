@@ -1,4 +1,4 @@
-module mcpop
+module github.com/jangtrinh/mcpop
 
 go 1.25.6
 
