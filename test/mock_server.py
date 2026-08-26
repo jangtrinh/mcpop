@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Rich Mock MCP Server for MCPOp End-to-End Observability Testing
-Supports real-world tool specifications and edge cases.
+Rich Mock MCP Server for MCPOp End-to-End Observability & Unit Testing
+Supports core test tools (calculate, fail_tool, slow_tool) and enterprise MCP tools (db/query, search/web, etc.).
 """
 import sys
 import json
@@ -32,8 +32,8 @@ def main():
                     "protocolVersion": "2024-11-05",
                     "capabilities": {"tools": {}},
                     "serverInfo": {
-                        "name": "enterprise-mock-mcp",
-                        "version": "2.1.0"
+                        "name": "mock-mcp-server",
+                        "version": "1.0.0"
                     }
                 }
             }
@@ -46,6 +46,25 @@ def main():
                 "id": msg_id,
                 "result": {
                     "tools": [
+                        {
+                            "name": "calculate",
+                            "description": "Perform basic arithmetic",
+                            "inputSchema": {
+                                "type": "object",
+                                "properties": {"expr": {"type": "string"}},
+                                "required": ["expr"]
+                            }
+                        },
+                        {
+                            "name": "fail_tool",
+                            "description": "Tool that always fails",
+                            "inputSchema": {"type": "object"}
+                        },
+                        {
+                            "name": "slow_tool",
+                            "description": "Tool that takes time to respond",
+                            "inputSchema": {"type": "object"}
+                        },
                         {
                             "name": "db/query",
                             "description": "Execute read-only SQL queries on PostgreSQL cluster",
@@ -126,7 +145,45 @@ def main():
             tool_name = params.get("name")
             args = params.get("arguments", {})
 
-            if tool_name == "db/query":
+            if tool_name == "calculate":
+                expr = args.get("expr", "0")
+                try:
+                    val = eval(expr, {"__builtins__": None}, {})
+                    result_content = [{"type": "text", "text": f"Result: {val}"}]
+                    is_error = False
+                except Exception as e:
+                    result_content = [{"type": "text", "text": f"Error: {e}"}]
+                    is_error = True
+
+                resp = {
+                    "jsonrpc": "2.0",
+                    "id": msg_id,
+                    "result": {
+                        "content": result_content,
+                        "isError": is_error
+                    }
+                }
+            elif tool_name == "fail_tool":
+                resp = {
+                    "jsonrpc": "2.0",
+                    "id": msg_id,
+                    "result": {
+                        "content": [{"type": "text", "text": "Database connection timeout (simulated)"}],
+                        "isError": True
+                    }
+                }
+            elif tool_name == "slow_tool":
+                delay = float(args.get("delay", 1.0))
+                time.sleep(delay)
+                resp = {
+                    "jsonrpc": "2.0",
+                    "id": msg_id,
+                    "result": {
+                        "content": [{"type": "text", "text": f"Finished after {delay}s"}],
+                        "isError": False
+                    }
+                }
+            elif tool_name == "db/query":
                 sql = args.get("sql", "")
                 if "SYNTAX_ERROR" in sql:
                     resp = {
@@ -147,7 +204,6 @@ def main():
                             "isError": False
                         }
                     }
-
             elif tool_name == "search/web":
                 query = args.get("query", "")
                 time.sleep(0.12)
@@ -159,7 +215,6 @@ def main():
                         "isError": False
                     }
                 }
-
             elif tool_name == "fs/read_file":
                 path = args.get("path", "")
                 time.sleep(0.02)
@@ -171,7 +226,6 @@ def main():
                         "isError": False
                     }
                 }
-
             elif tool_name == "ai/embed_text":
                 text = args.get("text", "")
                 time.sleep(0.08)
@@ -183,7 +237,6 @@ def main():
                         "isError": False
                     }
                 }
-
             elif tool_name == "auth/verify_session":
                 token = args.get("token", "")
                 if token == "expired_token_xyz":
@@ -206,7 +259,6 @@ def main():
                             "isError": False
                         }
                     }
-
             elif tool_name == "analytics/aggregate":
                 is_heavy = args.get("heavy", False)
                 if is_heavy:
