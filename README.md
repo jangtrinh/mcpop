@@ -150,8 +150,14 @@ make test
 python3 test/seed_data.py
 ```
 
+## Contributors
+
+- [Jang Trinh](https://github.com/jangtrinh) — Creator & Maintainer
+- [M15t](https://github.com/M15t) — CLI runner, module resolution, and security hardening
+
 ---
 
 ## License
 
 MIT License. Free and open source.
+
